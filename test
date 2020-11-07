@@ -1,1 +1,5 @@
-blabla
+#!/bin/bash
+# Exo 2 TD3 linux
+
+echo "je suis le meilleur en bash" 
+echo "blabla" 
