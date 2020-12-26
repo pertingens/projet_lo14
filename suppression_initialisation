@@ -1,0 +1,32 @@
+#!/bin/bash
+#permet de faire nos tests et de supprimer l'arborescence en cas de problème
+
+if [ "$UID" -ne "0" ]
+then
+    confirm()
+    {
+        read -r -p "${1} [y/N] " response
+
+        case "$response" in 
+            [yY][eE][sS]|[yY])
+                true;;
+            *)
+                false;;
+        esac
+    }
+
+    echo "ATTENTION, vous allez supprimer l'arborescence du projet"
+    if confirm "Supprimer ? yes or no";
+    then
+        rm -r /etc/tacheron;
+        rm /etc/tacherontab;
+        rm /etc/tacheron.allow;
+        rm /etc/tacheron.deny;
+        rm /var/log/tacheron;
+        echo "Suppression de l'arborescence effectuée"
+    else    
+        echo "Vous avez annulé la suppression";
+    fi
+else    
+    echo "Vous n'êtes pas identifier en tant que root, suppression impossible"
+fi
