@@ -24,7 +24,7 @@ else
     if [ ! -f /etc/tacherontab ]; #vérification si le fichier existe
     then
         touch /etc/tacherontab;
-        echo "fichier tacherontab créé;
+        echo "fichier tacherontab créé";
         chmod u+rwx,g-rwx,o-rwx tacherontab; #on doit autoriser que le root et les users de tacheron.allow à lire et écrire 
     else
         echo "fichier tacherontab déjà créé";
@@ -44,7 +44,7 @@ else
     if [ ! -f /etc/tacheron.deny ];
     then
         touch /etc/tacheron.deny;
-        echo "fichier user non autorisé créé;
+        echo "fichier user non autorisé créé";
     else
         echo "fichier user non autorisé déjà créé";
         exit 0
