@@ -3,6 +3,8 @@
 
 if [ "$UID" -ne "0" ]
 then
+    echo "Vous n'êtes pas identifier en tant que root, suppression impossible"
+else    
     confirm()
     {
         read -r -p "${1} [y/N] " response
@@ -27,6 +29,4 @@ then
     else    
         echo "Vous avez annulé la suppression";
     fi
-else    
-    echo "Vous n'êtes pas identifier en tant que root, suppression impossible"
 fi

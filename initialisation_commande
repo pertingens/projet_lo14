@@ -14,7 +14,7 @@ else
     if [ ! -d /etc/tacheron ]; #verification si le répertoire existe
     then 
         mkdir /etc/tacheron;
-        chmod u+rwx,g+r-wx,o+r-wx tacheron;
+        chmod u+rwx,g+r-wx,o+r-wx /etc/tacheron;
         echo "répertoire tacheron créé";
     else
         echo "répertoire tacheron déjà créé";
@@ -25,7 +25,7 @@ else
     then
         touch /etc/tacherontab;
         echo "fichier tacherontab créé";
-        chmod u+rwx,g-rwx,o-rwx tacherontab; #on doit autoriser que le root et les users de tacheron.allow à lire et écrire 
+        chmod u+rwx,g-rwx,o-rwx /etc/tacherontab; #on doit autoriser que le root et les users de tacheron.allow à lire et écrire 
     else
         echo "fichier tacherontab déjà créé";
         exit 0
@@ -35,7 +35,7 @@ else
     then    
         touch /etc/tacheron.allow;
         echo "fichier user autorisé créé";
-        chmod u+rwx,g-rwx,o-rwx tacheron.allow;
+        chmod u+rwx,g-rwx,o-rwx /etc/tacheron.allow;
     else
         echo "fichier tacheron.allow déjà créé";
         exit 0
@@ -45,12 +45,13 @@ else
     then
         touch /etc/tacheron.deny;
         echo "fichier user non autorisé créé";
+        chmod u+rwx,g-rwx,o-rwx /etc/tacheron.deny;
     else
         echo "fichier user non autorisé déjà créé";
         exit 0
     fi
 
-    if [ -f /var/log/tacheron ];
+    if [ ! -f /var/log/tacheron ];
     then
         touch /var/log/tacheron;
         echo "fichier historique créé"
