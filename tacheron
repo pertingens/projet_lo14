@@ -77,6 +77,164 @@ verifier_tacherontab()
     fi
 }
 
+verif_seconde()
+{
+    if [[ $1 = ^[0-3]$ ]]
+    then
+        return true
+    elif [[ $1 = ^([0-3](,[0-3])+(~[0-3])*)$ ]]
+    then
+        return true
+    elif [[ $1 = ^([0-3]-[0-3](~[0-3])*)$ ]]
+    then
+        return true
+    elif [ $1 = 'README.md' ]
+    then
+        return true
+    
+    elif [[ $1 = ^([0-3]-[0-3](~[0-3])*/[0-3])$ ]]
+    then
+        return true
+    elif [[ $1 = ^(*/[0-3])$ ]]
+    then
+        return true
+    else
+        return false
+    fi
+}
+
+verif_minute()
+{
+    if [[ $1 = ^[0-59]$ ]]
+    then
+        return true
+    elif [[ $1 = ^([0-59](,[0-59])+(~[0-59])*)$ ]]
+    then
+        return true
+    elif [[ $1 = ^([0-59]-[0-59](~[0-59])*)$ ]]
+    then
+        return true
+    elif [ $1 = 'README.md' ]
+    then
+        return true
+    
+    elif [[ $1 = ^([0-59]-[0-59](~[0-59])*/[0-59])$ ]]
+    then
+        return true
+    elif [[ $1 = ^(*/[0-59])$ ]]
+    then
+        return true
+    else
+        return false
+    fi
+}
+
+verif_heure()
+{
+    if [[ $1 = ^[0-23]$ ]]
+    then
+        return true
+    elif [[ $1 = ^([0-23](,[0-23])+(~[0-23])*)$ ]]
+    then
+        return true
+    elif [[ $1 = ^([0-23]-[0-23](~[0-23])*)$ ]]
+    then
+        return true
+    elif [ $1 = 'README.md' ]
+    then
+        return true
+    
+    elif [[ $1 = ^([0-23]-[0-23](~[0-23])*/[0-23])$ ]]
+    then
+        return true
+    elif [[ $1 = ^(*/[0-23])$ ]]
+    then
+        return true
+    else
+        return false
+    fi 
+}
+
+verif_jourDuMois()
+{
+   if [[ $1 = ^[1-31]$ ]]
+    then
+        return true
+    elif [[ $1 = ^([1-31](,[1-31])+(~[1-31])*)$ ]]
+    then
+        return true
+    elif [[ $1 = ^([1-31]-[1-31](~[1-31])*)$ ]]
+    then
+        return true
+    elif [ $1 = 'README.md' ]
+    then
+        return true
+    
+    elif [[ $1 = ^([1-31]-[1-31](~[1-31])*/[1-31])$ ]]
+    then
+        return true
+    elif [[ $1 = ^(*/[1-31])$ ]]
+    then
+        return true
+    else
+        return false
+    fi 
+}
+
+verif_moisDeAnnee()
+{
+   if [[ $1 = ^[1-12]$ ]]
+    then
+        return true
+    elif [[ $1 = ^([1-12](,[1-12])+(~[1-12])*)$ ]]
+    then
+        return true
+    elif [[ $1 = ^([12-12]-[1-12](~[1-12])*)$ ]]
+    then
+        return true
+    elif [ $1 = 'README.md' ]
+    then
+        return true
+    
+    elif [[ $1 = ^([1-12]-[1-12](~[1-12])*/[1-12])$ ]]
+    then
+        return true
+    elif [[ $1 = ^(*/[1-12])$ ]]
+    then
+        return true
+    else
+        return false
+    fi 
+}
+
+verif_jourDeSemaine()
+{
+   if [[ $1 = ^[0-6]$ ]]
+    then
+        return true
+    elif [[ $1 = ^([0-6](,[0-6])+(~[0-6])*)$ ]]
+    then
+        return true
+    elif [[ $1 = ^([0-6]-[0-6](~[0-6])*)$ ]]
+    then
+        return true
+    elif [ $1 = 'README.md' ]
+    then
+        return true
+    
+    elif [[ $1 = ^([0-6]-[0-6](~[0-6])*/[0-6])$ ]]
+    then
+        return true
+    elif [[ $1 = ^(*/[0-6])$ ]]
+    then
+        return true
+    else
+        return false
+    fi 
+}
+
+
+
 #seul le root peut initialiser la commmande
 #vérifier que les répertoire existe
 #si oui alors fin de l'initialisation
@@ -275,7 +433,12 @@ then
     fi
 elif [ $# -ge 7 ]
 then
-    
+    if verif_seconde $1 || verif_minute $2 || verif_heure $3 || verif_jourDuMois $4 || verif_moisDeAnnee $5 || verif_jourDeSemaine $6
+    then
+
+    else
+        erreur_saisie
+    fi 
 else
    erreur_saisie
 fi 

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#test regex
+
+echo '2 30 2 1,15 * * -u augustin /sbin/shutdown -r'>temp
+cat temp
+sed -r "/[-u]/--user" temp
+cat temp
