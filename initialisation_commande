@@ -54,6 +54,9 @@ else
     if [ ! -f /var/log/tacheron ];
     then
         touch /var/log/tacheron;
+        echo "----------------------------------" >> /var/log/tacheron
+        echo "Historique de la commande TACHERON" >> /var/log/tacheron
+        echo "----------------------------------" >> /var/log/tacheron
         echo "fichier historique créé"
     else
         echo "fichier historique déjà créé";
