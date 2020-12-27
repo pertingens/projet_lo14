@@ -60,6 +60,7 @@ help()
     echo "[SECONDE][MINUTE][HEURES][JOUR DU MOIS][MOIS DE L'ANNEE][JOUR DE LA SEMAINE][COMMANDE]"
 }
 
+
 verifier_tacherontab()
 {
     if [ -d $1 ]
@@ -74,10 +75,10 @@ if [ $# -eq 1 ]
 then 
     if [ $1 = "help" ]
     then
-        help()
+        help 
     elif [ $1 = "-l" ] || [ $1 = "--aff" ]
     then
-        if verifier_tacherontab() "/etc/tacherontab"
+        if verifier_tacherontab "/etc/tacherontab"
         then
             cat  /etc/tacherontab
         else
@@ -85,7 +86,7 @@ then
         fi
     elif [ $1 = "-r" ] || [ $1 = "--rem" ]
     then
-        if verifier_tacherontab() "/etc/tacherontab"
+        if verifier_tacherontab "/etc/tacherontab"
         then
             rm  /etc/tacherontab
         else
@@ -93,14 +94,14 @@ then
         fi
     elif [ $1 = "-e"  ] || [ $1 = "--edit" ]
     then
-        if verifier_tacherontab() "/etc/tacherontab"
+        if verifier_tacherontab "/etc/tacherontab"
         then
             vi  /etc/tacherontab
         else
             erreur_fichier_inexistant "/etc/tacherontab"
         fi
     else
-        erreur_saisie()
+        erreur_saisie
     fi  
 elif [ $# -eq 2 ]
 then
@@ -131,7 +132,7 @@ then
         then 
             if [ $1 = "-l" ] || [ $1 = "--aff" ]
             then
-                if verifier_tacherontab() "/etc/tacherontab$2"
+                if verifier_tacherontab "/etc/tacherontab$2"
                 then
                     cat  /etc/tacherontab
                 else
@@ -139,7 +140,7 @@ then
                 fi
             elif [ $1 = "-r" ] || [ $1 = "--rem" ]
             then
-                if verifier_tacherontab() "/etc/tacherontab$2"
+                if verifier_tacherontab "/etc/tacherontab$2"
                 then
                     rm  /etc/tacherontab
                 else
@@ -147,26 +148,26 @@ then
                 fi
             elif [ $1 = "-e"  ] || [ $1 = "--edit" ]
             then
-                if verifier_tacherontab() "/etc/tacherontab$2"
+                if verifier_tacherontab "/etc/tacherontab$2"
                 then
                     vi  /etc/tacherontab
                 else
                     erreur_fichier_inexistant "/etc/tacherontab$2"
                 fi
             else
-                erreur_saisie()
+                erreur_saisie
             fi
         else
-           erreur_saisie()
+           erreur_saisie
         fi
     else
-        erreur_saisie()
+        erreur_saisie
     fi
 elif [ $# -eq 7 ]
 then
     
 else
-   erreur_saisie()
+   erreur_saisie
 fi 
 
 
