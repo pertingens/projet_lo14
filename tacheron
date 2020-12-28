@@ -2,19 +2,21 @@
 
 #projet lo14
 
+#affichage en cas d'erreur de saisie
 erreur_saisie()
 {
     echo "mauvais argument(s) pour tacheron"
     echo "help pour plus d'information"
     exit 0
 }
-
+#affichage en cas d'erreur de fichier
 erreur_fichier_inexistant()
 {
     echo "le fichier $1 est inexistant"
     exit 0
 }
 
+# toutes les fonctions d'affichage pour le help
 help_user()
 {
     echo "user - specifie un utilisateur particulier"
@@ -67,6 +69,12 @@ help()
     echo "[SECONDE][MINUTE][HEURES][JOUR DU MOIS][MOIS DE L'ANNEE][JOUR DE LA SEMAINE][COMMANDE]"
 }
 
+verif_permissionUser()
+{
+    
+}
+
+# verifier si le tacheron tab existe
 verifier_tacherontab()
 {
     if [ -d $1 ]
@@ -77,24 +85,30 @@ verifier_tacherontab()
     fi
 }
 
+# fonction de de verification pour le chanps des secondes
 verif_seconde()
 {
+    # Une valeur précise
     if [[ $1 = ^[0-3]$ ]]
     then
         return true
-    elif [[ $1 = ^([0-3](,[0-3])+(~[0-3])*)$ ]]
+    #Une liste de valeurs valides, séparées par des virgules
+    elif [[ $1 = ^([0-3](,[0-3])+)$ ]]
     then
         return true
+    # Un intervalle avec les ~pris en compte
     elif [[ $1 = ^([0-3]-[0-3](~[0-3])*)$ ]]
     then
         return true
+    # toutes les valeurs du champs
     elif [ $1 = 'README.md' ]
     then
         return true
-    
+    # division d'un intervalle par un nombre precis
     elif [[ $1 = ^([0-3]-[0-3](~[0-3])*/[0-3])$ ]]
     then
         return true
+    # division de toutes les valeurs du champs par un nombre
     elif [[ $1 = ^(*/[0-3])$ ]]
     then
         return true
@@ -103,24 +117,30 @@ verif_seconde()
     fi
 }
 
+# fonction de de verification pour le chanps des minutes
 verif_minute()
 {
+    # Une valeur précise
     if [[ $1 = ^[0-59]$ ]]
     then
         return true
-    elif [[ $1 = ^([0-59](,[0-59])+(~[0-59])*)$ ]]
+    #Une liste de valeurs valides, séparées par des virgules
+    elif [[ $1 = ^([0-59](,[0-59])+)$ ]]
     then
         return true
+    # Un intervalle avec les ~pris en compte
     elif [[ $1 = ^([0-59]-[0-59](~[0-59])*)$ ]]
     then
         return true
+    # toutes les valeurs du champs
     elif [ $1 = 'README.md' ]
     then
         return true
-    
+    # division d'un intervalle par un nombre precis
     elif [[ $1 = ^([0-59]-[0-59](~[0-59])*/[0-59])$ ]]
     then
         return true
+    # division de toutes les valeurs du champs par un nombre
     elif [[ $1 = ^(*/[0-59])$ ]]
     then
         return true
@@ -129,24 +149,30 @@ verif_minute()
     fi
 }
 
+# fonction de de verification pour le chanps des heures
 verif_heure()
 {
+    # Une valeur précise
     if [[ $1 = ^[0-23]$ ]]
     then
         return true
-    elif [[ $1 = ^([0-23](,[0-23])+(~[0-23])*)$ ]]
+    #Une liste de valeurs valides, séparées par des virgules
+    elif [[ $1 = ^([0-23](,[0-23])+)$ ]]
     then
         return true
+    # Un intervalle avec les ~pris en compte
     elif [[ $1 = ^([0-23]-[0-23](~[0-23])*)$ ]]
     then
         return true
+    # toutes les valeurs du champs
     elif [ $1 = 'README.md' ]
     then
         return true
-    
+    # division d'un intervalle par un nombre precis
     elif [[ $1 = ^([0-23]-[0-23](~[0-23])*/[0-23])$ ]]
     then
         return true
+    # division de toutes les valeurs du champs par un nombre
     elif [[ $1 = ^(*/[0-23])$ ]]
     then
         return true
@@ -155,24 +181,30 @@ verif_heure()
     fi 
 }
 
+# fonction de de verification pour le chanps des jours du mois
 verif_jourDuMois()
 {
+    # Une valeur précise
    if [[ $1 = ^[1-31]$ ]]
     then
         return true
-    elif [[ $1 = ^([1-31](,[1-31])+(~[1-31])*)$ ]]
+    #Une liste de valeurs valides, séparées par des virgules
+    elif [[ $1 = ^([1-31](,[1-31])+)$ ]]
     then
         return true
+    # Un intervalle avec les ~pris en compte
     elif [[ $1 = ^([1-31]-[1-31](~[1-31])*)$ ]]
     then
         return true
+    # toutes les valeurs du champs
     elif [ $1 = 'README.md' ]
     then
         return true
-    
+    # division d'un intervalle par un nombre precis
     elif [[ $1 = ^([1-31]-[1-31](~[1-31])*/[1-31])$ ]]
     then
         return true
+    # division de toutes les valeurs du champs par un nombre
     elif [[ $1 = ^(*/[1-31])$ ]]
     then
         return true
@@ -181,24 +213,30 @@ verif_jourDuMois()
     fi 
 }
 
+# fonction de de verification pour le chanps des mois de l'annee
 verif_moisDeAnnee()
 {
+    # Une valeur précise
    if [[ $1 = ^[1-12]$ ]]
     then
         return true
-    elif [[ $1 = ^([1-12](,[1-12])+(~[1-12])*)$ ]]
+    #Une liste de valeurs valides, séparées par des virgules
+    elif [[ $1 = ^([1-12](,[1-12])+)$ ]]
     then
         return true
+    # Un intervalle avec les ~pris en compte
     elif [[ $1 = ^([12-12]-[1-12](~[1-12])*)$ ]]
     then
         return true
+    # toutes les valeurs du champs
     elif [ $1 = 'README.md' ]
     then
         return true
-    
+    # division d'un intervalle par un nombre precis
     elif [[ $1 = ^([1-12]-[1-12](~[1-12])*/[1-12])$ ]]
     then
         return true
+    # division de toutes les valeurs du champs par un nombre
     elif [[ $1 = ^(*/[1-12])$ ]]
     then
         return true
@@ -207,24 +245,30 @@ verif_moisDeAnnee()
     fi 
 }
 
+# fonction de de verification pour le chanps des jours de la semaine
 verif_jourDeSemaine()
 {
+    # Une valeur précise
    if [[ $1 = ^[0-6]$ ]]
     then
         return true
-    elif [[ $1 = ^([0-6](,[0-6])+(~[0-6])*)$ ]]
+    #Une liste de valeurs valides, séparées par des virgules
+    elif [[ $1 = ^([0-6](,[0-6])+)$ ]]
     then
         return true
+    # Un intervalle avec les ~pris en compte
     elif [[ $1 = ^([0-6]-[0-6](~[0-6])*)$ ]]
     then
         return true
+    # toutes les valeurs du champs
     elif [ $1 = 'README.md' ]
     then
         return true
-    
+    # division d'un intervalle par un nombre precis
     elif [[ $1 = ^([0-6]-[0-6](~[0-6])*/[0-6])$ ]]
     then
         return true
+    # division de toutes les valeurs du champs par un nombre
     elif [[ $1 = ^(*/[0-6])$ ]]
     then
         return true
@@ -233,7 +277,86 @@ verif_jourDeSemaine()
     fi 
 }
 
+transformation_argument()
+{
+    #on met tous les files et rep du dossier courant dans un fichier temp et on compte le nombre d'occurence
+    for i in `echo * | tr " " " "`
+    do 
+        echo $i >> temp
+    done
+    compteurls=$(cat temp | wc -l)
+    #compteur utilise pour savoir si il faut ajouter a temp2 ou pas
+    let "compteur = 0"
+    let "compteurUser = 0"
+    for i in "$@"
+    do
+        if [ $i = "-u" ] ||[ $i = "--user" ]
+        then
+            let "compteurUser = compteurUser + 1"
+        else
+            if [ $compteurUser -ne 1 ]
+            then
+                echo "0" > estDedans
+                while read ligne
+                do
+                    if [ $ligne = $i ]
+                    then
+                        
+                        echo "1" > estDedans
+                        let "compteur = compteur + 1"
+                        echo "$1" >> temp3
+                        break
+                    fi
+                done < temp
 
+                result=$(head -n 1 estDedans)
+                if [ $result -eq 0 ]
+                then
+                    if [ $compteur -gt 0 ] && [ $compteur -lt $compteurls ]
+                    then
+                        cat temp3 | while read ligne
+                                    do
+                                        echo "$ligne" >> temp2
+                                    done
+                        
+                        let "compteur = 0"
+                        rm temp3
+                    fi
+                    echo "$i" >> temp2
+                fi
+
+                if [ $compteur -eq $compteurls ]
+                then
+                    echo "*" >> temp2
+                    let "compteur = 0"
+                    rm temp3
+                fi
+            else
+                let "compteurUser = 0"
+            fi
+        fi
+    done
+    cat temp2
+
+    let "compteur = 1"
+    result=$(whoami)
+    while read ligne
+    do
+        if [ $compteur -eq 7 ]
+        then
+            result="$result \"$ligne"
+        else
+            result="$result $ligne"
+        fi
+        let "compteur = compteur + 1"
+    done < temp2
+    result="$result\""
+    echo "$result"
+    rm temp2
+    rm temp
+    rm estDedans
+    echo "$result"
+}
 
 #seul le root peut initialiser la commmande
 #vérifier que les répertoire existe
@@ -395,32 +518,33 @@ then
     then
         cat /etc/passwd | cut -d ":" -f 1 > temp
         userTemp = grep -c ^$2$ temp
+        rm temp
 
         if [ $userTemp -eq 1 ]
         then 
             if [ $1 = "-l" ] || [ $1 = "--aff" ]
             then
-                if verifier_tacherontab "/etc/tacherontab$2"
+                if verifier_tacherontab "/etc/tacheron/tacherontab$2"
                 then
                     cat  /etc/tacherontab
                 else
-                    erreur_fichier_inexistant "/etc/tacherontab$2"
+                    erreur_fichier_inexistant "/etc/tacheron/tacherontab$2"
                 fi
             elif [ $1 = "-r" ] || [ $1 = "--rem" ]
             then
-                if verifier_tacherontab "/etc/tacherontab$2"
+                if verifier_tacherontab "/etc/tacheron/tacherontab$2"
                 then
                     rm  /etc/tacherontab
                 else
-                    erreur_fichier_inexistant "/etc/tacherontab$2"
+                    erreur_fichier_inexistant "/etc/tacheron/tacherontab$2"
                 fi
             elif [ $1 = "-e"  ] || [ $1 = "--edit" ]
             then
-                if verifier_tacherontab "/etc/tacherontab$2"
+                if verifier_tacherontab "/etc/tacheron/tacherontab$2"
                 then
                     vi  /etc/tacherontab
                 else
-                    erreur_fichier_inexistant "/etc/tacherontab$2"
+                    erreur_fichier_inexistant "/etc/tacheron/tacherontab$2"
                 fi
             else
                 erreur_saisie
@@ -435,7 +559,24 @@ elif [ $# -ge 7 ]
 then
     if verif_seconde $1 || verif_minute $2 || verif_heure $3 || verif_jourDuMois $4 || verif_moisDeAnnee $5 || verif_jourDeSemaine $6
     then
+        if [ $7 = '-u' ] || [ $7 = '--user' ]
+        then
+            cat /etc/passwd | cut -d ":" -f 1 > temp
+            userTemp = grep -c ^$8$ temp
+            rm temp
 
+            if [ $userTemp -eq 1 ]
+            then
+                result=$(transformation_argument $@)
+                result >> "/etc/tacheron/tacherontab$8"
+            else
+                echo "mauvais utilisateur"
+                erreur_saisie
+            fi
+        else
+            result=$(transformation_argument $@)
+            result >> "/etc/tacherontab"
+        fi
     else
         erreur_saisie
     fi 
