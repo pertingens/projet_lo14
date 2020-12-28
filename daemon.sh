@@ -6,50 +6,104 @@ vertfonce='\e[0;32m'
 orange='\e[0;33m'
 violetclair='\e[1;35m'
 
-nom_du_jour_reelle = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f1)
-jour_reelle = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f2)
-mois_reelle = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f3)
-heure_reelle = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f4)
-minute_reelle = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f5)
-seconde_reelle = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f6)
+nom_du_jour_reel = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f1)
+jour_reel = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f2)
+mois_reel = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f3)
+heure_reel = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f4)
+minute_reel = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f5)
+seconde_reel = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f6)
+if [ $seconde_reel -eq 0 ]; 
+then
+        interval_seconde_reel = 0
+elif [ $seconde_reel -gt 0 ] && [ $seconde_reel -le 15 ];
+then 
+        interval_seconde_reel = 1
+elif [ $seconde_reel -gt 15 ] && [ $seconde_reel -ls 30 ];
+then    
+        interval_seconde_reel = 2
+else
+        interval_seconde_reel = 3
+fi
 
-date_reelle= $(date +%u-%d-%m-%H-%M-%S)
+date_reel= $(date +%u-%d-%m-%H-%M-%S)
  
 
-cat /etc/tacherontab | while read w1 w2 w3 w4 w5 w6 w7 w8
+cat /etc/tacherontab | while read user_programmeur seconde_virtuel minute_virtuel heure_virtuel jour_virtuel mois_virtuel nom_du_jour_virtuel commande
 do
-user_programmeur = $(echo $w1)
 
-mois_virtuel = $(echo $w6)
-if [[ $w6 = ^[1-12]$ ]]; 
-then
-       debut_intervalle = `echo $w1 | cut -d'-' -f1`
-       fin_intervalle = `echo $w1 | cut -d'-' -f2`
-       if [ $mois_reelle ge $debut_intervalle ] && [ $mois_reelle le $fin_intervalle ];
-       then 
-
-        else
-                exit 0
-        fi
-elif 
-
-fi
-nom_du_jour_virtuel = $(echo $w7)
-jour_virtuel = $(echo $w5)
-heure_virtuel = $(echo $w4)
-minute_virtuel = $(echo $w3)
-seconde_virtuel = $(echo $w2)
-date_virtuelle = $nom_du_jour_virtuel-$jour_virtuel-$mois_virtuel-$heure_virtuel-$minute_virtuel-$seconde_virtuel
-        if [ date_reelle = date_virtuelle ];
+        if [[ $mois_virtuel = ^[1-12]$ ]]; #format valeur précis
         then
-                ""$w8"" #affichage commande sur la sortie standard
+                if [ $mois_reel = $mois_virtuel ];
+                then 
+                        test jour
+                else
+                        exit 0
+                fi
+       
+        elif [[ $mois_virtuel = ^([1-12](,[1-12])+)$ ]]; #format liste
+        then 
+                nb_caractere_liste = echo $mois_virtuel | wc -c;
+                position = 0;
+                while [ $position != $nb_caractere_liste ];
+                do 
+                        caractere = echo $mois_virtuel | cut -c$position
+                        if [ $caractere = "," ];
+                        then
+                                position += 1;
+                        elif [ $caractere -eq $mois_reel ];
+                        then 
+                                test jour
+                        else
+                                position += 1 
+                        fi
+                done 
+
+        elif [[ $mois_virtuel = ^([12-12]-[1-12](~[1-12])*)$ ]]; #format intervalle avec exceptions pris en compte
+        then 
+                debut_intervalle = `echo $mois_virtuel | cut -c1`
+                fin_intervalle = `echo $mois_virtuel | cut -c3`
+                nb_caractere_liste = echo $mois_virtuel | wc -c;
+                if [ $nb_caractere_liste -gt 3 ]; #des exceptions sont indiquées
+                then
+                        récupérer les exceptions et comparé mois reelle aux exceptions
+                
+                
+                elif [ $mois_reel ge $debut_intervalle ] && [ $mois_reelle le $fin_intervalle ]; #pas d'exception, on compare l'interval direct
+                then 
+                        test jour
+                else
+                        exit 0
+                fi
+
+        elif [ $mois_virtuel = '*' ]; #toutes les valeurs
+        then 
+                test jour
+
+        elif [[ $mois_virtuel = ^([1-12]-[1-12](~[1-12])*/[1-12])$ ]]; #division intervalle par un nombre précis
+        then
+                test si le mois fait partie de la division
+                si oui, test jour
+                sinon on sort
+
+        elif [[ $mois_virtuel = ^(*/[1-12])$ ]]; #division de toutes les valeurs par un nombre
+        then
+                test si le mois fait partie de la division
+                si oui, on test le jour
+                sinon on sort
+
+        fi
+
+date_virtuel = $nom_du_jour_virtuel-$jour_virtuel-$mois_virtuel-$heure_virtuel-$minute_virtuel-$seconde_virtuel
+        if [ $date_reelle = $date_virtuelle ];
+        then
+                $commande #affichage commande sur la sortie standard
                 if [ $? -eq 0 ];
                 then
-                        echo -e "- $w8 effectué le ${orange}<$date_virtuelle> ${blanc}programmé par ${violetclair}$user_programmeur ${vertfonce}[Réussi]${blanc}\n" >> /var/log/tacheron
+                        echo -e "- $commande effectué le ${orange}<$date_virtuel> ${blanc}programmé par ${violetclair}$user_programmeur ${vertfonce}[Réussi]${blanc}\n" >> /var/log/tacheron
                         #on ecrit dans le fichier log historique ok
                 else
-                        error = $(w8);
-                        echo -e "$w8 effectué le ${orange}<$date_virtuelle> ${blanc}programmé par ${violetclair}$user_programmeur ${rougefonce}[ECHEC] ${blanc}Erreur: $error \n" >> /var/log/tacheron
+                        error = $($commande 2>&1); #on récupère le message d'erreur dans une variable
+                        echo -e "$w8 effectué le ${orange}<$date_virtuel> ${blanc}programmé par ${violetclair}$user_programmeur ${rougefonce}[ECHEC] ${blanc}Erreur: $error \n" >> /var/log/tacheron
                 fi
         fi
 done
