@@ -6,33 +6,33 @@ rougefonce='\e[0;31m'
 vertfonce='\e[0;32m'
 orange='\e[0;33m'
 violetclair='\e[1;35m'
+bleu='\e[1;34m'
 #-------------------------------------------------------
 
 
 #boucle sans fin (à démarrer en processus demon dès l'ouverture du système et en arrière-plan)
 while [ true ]
 do
-        temps_debut_execution = $(date +"%s")
+        temps_debut_execution=$(date +"%s")
         touch /etc/tacheron/tacherontabtmp #création d'un fichier qui accueillera les commandes à exécuter de chaque utilisateur
 
         #tableau pour la date et heure système réelle
-        date_reel[1] = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f6) #seconde reel
-        date_reel[2] = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f5) #minute reel
-        date_reel[3] = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f4) #heure reel
-        date_reel[4] = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f2) #jour reel
-        date_reel[5] = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f3) #mois reel
-        date_reel[6] = $(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f1) #nom du jour reel
-        date_reel= $(date +%u-%d-%m-%H-%M-%S)
+        date_reel[1]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f6) #seconde reel
+        date_reel[2]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f5) #minute reel
+        date_reel[3]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f4) #heure reel
+        date_reel[4]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f2) #jour reel
+        date_reel[5]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f3) #mois reel
+        date_reel[6]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f1) #nom du jour reel
+        date_reel=$(date +%u-%d-%m-%H-%M-%S)
        
         #on boucle sur les utilisateurs de tacheron.allow
         while read user
-
+        do
                 #on boucle sur le fichier tacherontab[user] pour lire les commandes
                 while read user_programmeur seconde_virtuel minute_virtuel heure_virtuel jour_virtuel mois_virtuel nom_du_jour_virtuel commande
                 do
-                date_virtuel = $nom_du_jour_virtuel-$jour_virtuel-$mois_virtuel-$heure_virtuel-$minute_virtuel-$seconde_virtuel;
-                execution_commande="faux";
-                indice_date_reel="1";
+                date_virtuel=$nom_du_jour_virtuel-$jour_virtuel-$mois_virtuel-$heure_virtuel-$minute_virtuel-$seconde_virtuel;
+                execution_commande="vrai";
                 #on teste si le user qui a indiqué la commande a été banni entre deux
                 if ( grep "$user_programmeur" "/etc/tacheron.deny" ); 
                 then
@@ -43,15 +43,15 @@ do
                         #test interval seconde réelle
                         if [ "${date_reel[1]}" -eq "0" ]; 
                         then
-                                interval_seconde_reel = 0
+                                interval_seconde_reel="0"
                         elif [ "${date_reel[1]}" -gt 0 ] && [ "${date_reel[1]}" -le 15 ];
                         then 
-                                interval_seconde_reel = 1
-                        elif [ "${date_reel[1]}" -gt 15 ] && [ "${date_reel[1]}" -ls 30 ];
+                                interval_seconde_reel="1"
+                        elif [ "${date_reel[1]}" -gt 15 ] && [ "${date_reel[1]}" -le 30 ];
                         then    
-                                interval_seconde_reel = 2
+                                interval_seconde_reel="2"
                         else
-                                interval_seconde_reel = 3
+                                interval_seconde_reel="3"
                         fi
 
                         #on test l'interval des secondes
@@ -59,11 +59,13 @@ do
                         then
                                 if [ "${date_reel[1]}" != "$interval_seconde_reel" ] ; #si les secondes correspondent au passe au champ suivant
                                 then
+                                        execution_commande="faux"
                                         continue #si les secondes correspondent pas, on continue de tester les autres lignes de tacherontab (continue s'applique au while)
                                 fi
                         fi
 
                         #si l'interval des secondes correspond, on teste les autres champs temporels
+                        indice_date_reel="1";
                         for indice in "$minute_virtuel" "$heure_virtuel" "$jour_virtuel" "$mois_virtuel" "$nom_du_jour_virtuel"
                         do 
                                 indice_date_reel="$indice_date_reel+1"
@@ -139,25 +141,27 @@ do
                                         break #le champs ne correspond pas à la date
                                 fi
                         done
+                        date_reel=$(date +%A-%d-%m-%Y) #mise en page de la date de l'exécution de la commande pour le fichier log
+                        heure_reel=$(date +%H-%M-%S) #mise en page de l'heure de l'exécution de la commande pour le fichier log
                         if [ "$execution_commande" = "vrai" ];
                         then
-                                echo "$user_programmeur $date_virtuel $commande" >> "/etc/tacheron/tacherontabtmp" #on indique la commande dans le fichier temporaire qui execute les commandes valides
+                                echo "$user_programmeur $date_reel $heure_reel $commande" >> "/etc/tacheron/tacherontabtmp" #on indique la commande dans le fichier temporaire qui execute les commandes valides
                         fi
                 fi
                 done < /etc/tacherontab$user #lecture des commandes de tacherontab
         done < /etc/tacheron.allow #lecture des utilisateurs autorisés
 
         #exécution des commandes du fichier temporaire
-        while read user_programmeur date_virtuel commande
+        while read user_programmeur date_reel heure_reel commande
         do
                 sudo $commande #affichage commande sur la sortie standard s'il y a lieu
                 if [ $? -eq 0 ];
                 then
-                        echo -e "- $commande effectué le ${orange}<$date_virtuel> ${blanc}programmé par ${violetclair}$user_programmeur ${vertfonce}[Réussi]${blanc}\n" >> /var/log/tacheron
+                        echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${vertfonce}[Réussi]${blanc}\n" >> /var/log/tacheron
                         #on écrit dans le fichier log historique ok
                 else
-                        error = $($commande 2>&1); #on récupère le message d'erreur dans une variable
-                        echo -e "$commande effectué le ${orange}<$date_virtuel> ${blanc}programmé par ${violetclair}$user_programmeur ${rougefonce}[ECHEC] ${blanc}Erreur: $error \n" >> /var/log/tacheron
+                        error=$($commande 2>&1); #on récupère le message d'erreur dans une variable
+                        echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${rougefonce}[ECHEC] ${blanc}Erreur: $error \n" >> /var/log/tacheron
                 fi
 
         done < /etc/tacheron/tacherontabtmp
@@ -171,5 +175,4 @@ do
         #pause de la boucle durant 15 secondes
         pause=`expr $temps_debut_execution - $(date +"%s") + 15`
         sleep $pause
-
 done
