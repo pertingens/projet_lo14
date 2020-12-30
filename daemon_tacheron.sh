@@ -145,7 +145,7 @@ do
         #exécution des commandes du fichier temporaire
         while read user_programmeur date_reel heure_reel commande
         do
-                if [[] -n $commande ]]; #permet la résolution d'un problème d'écriture dans tmp
+                if [[ -n $commande ]]; #permet la résolution d'un problème d'écriture dans tmp
                 then
                         sudo $commande #affichage commande sur la sortie standard s'il y a lieu
                         if [ $? -eq 0 ];
