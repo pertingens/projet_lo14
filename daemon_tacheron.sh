@@ -34,10 +34,10 @@ do
                 date_virtuel=$nom_du_jour_virtuel-$jour_virtuel-$mois_virtuel-$heure_virtuel-$minute_virtuel-$seconde_virtuel;
                 execution_commande="vrai";
                 #on teste si le user qui a indiqué la commande a été banni entre deux
-                if ( grep "$user_programmeur" "/etc/tacheron.deny" ); 
+                if ( grep "$user_programmeur" "/etc/tacheron.deny" ) >/dev/null 2>&1; #permet de ne pas afficher le grep 
                 then
-                        echo "La commande $commande n'a pas été effectué car l'utilisateur qui l'a programmé a été banni";
-                        echo -e "$commande effectué le ${orange}<$date_virtuel> ${blanc}programmé par ${violetclair}$user_programmeur ${rougefonce}[ECHEC] ${blanc}Erreur: Utilisateur programmeur banni\n" >> /var/log/tacheron;
+                        #echo "La commande $commande n'a pas été effectué car l'utilisateur qui l'a programmé a été banni";
+                        echo -e "- ${bleu}$commande ${blanc}programmé par ${violetclair}$user_programmeur ${rougefonce}[ECHEC] ${blanc}Erreur: Utilisateur programmeur banni\n" >> /var/log/tacheron;
                         execution_commande="faux"
                         continue
                 fi
