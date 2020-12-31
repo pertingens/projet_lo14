@@ -5,18 +5,10 @@
 
 executer_commande_tacheron()
 {
-        while read ligne #user_programmeur seconde_virtuel minute_virtuel heure_virtuel jour_virtuel mois_virtuel nom_du_jour_virtuel commande
-                do
-                echo "$ligne" > temp
-                user_programmeur=$(cut -d" " -f1 temp)
-                seconde_virtuel=$(cut -d" " -f2 temp)
-                minute_virtuel=$(cut -d" " -f3 temp)
-                heure_virtuel=$(cut -d" " -f4 temp)
-                jour_virtuel=$(cut -d" " -f5 temp)
-                mois_virtuel=$(cut -d" " -f6 temp)
-                nom_du_jour_virtuel=$(cut -d" " -f7 temp)
-                commande=$(cut -d" " -f8 temp)
-                rm temp
+        while read user_programmeur seconde_virtuel minute_virtuel heure_virtuel jour_virtuel mois_virtuel nom_du_jour_virtuel commande
+        do
+                commande="$(echo $commande | sed s/\"//g)" #supprime les " autour de la commande
+                echo "commande= $commande"
 
                 date_virtuel=$nom_du_jour_virtuel-$jour_virtuel-$mois_virtuel-$heure_virtuel-$minute_virtuel-$seconde_virtuel;
                 execution_commande="vrai";
