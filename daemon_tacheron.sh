@@ -15,37 +15,37 @@ then
         if [ ! -d /etc/tacheron ]; #verification si le répertoire existe
         then 
             mkdir /etc/tacheron;
-            chmod u+rwx,g+r-wx,o+r-wx /etc/tacheron;
+            chmod 777 /etc/tacheron;
         fi
 
         if [ ! -f /etc/tacherontab ]; #vérification si le fichier pour le root existe
         then
             touch /etc/tacherontab;
-            chmod u+rwx,g+r-wx,o+r-wx /etc/tacherontab; #on doit autoriser que le root à écrire 
+            chmod 777 /etc/tacherontab; #on doit autoriser que le root à écrire 
         fi
 
         if [ ! -f /etc/tacheron/tacherontab$(whoami) ]; #vérification si le fichier user connecté existe
         then
-                touch /etc/tacheron/tacherontab$(whoami);
-                chmod u+rwx,g+rwx,o+r-wx;
+            touch /etc/tacheron/tacherontab$(whoami);
+            chmod 777 /etc/tacheron/tacherontab$(whoami);
         fi
 
         if [ ! -f /etc/tacheron.allow ];
         then    
             touch /etc/tacheron.allow;
-            chmod u+rwx,g+r-wx,o+r-wx /etc/tacheron.allow;
+            chmod 744 /etc/tacheron.allow;
         fi
 
         if [ ! -f /etc/tacheron.deny ];
         then
             touch /etc/tacheron.deny;
-            chmod u+rwx,g+r-wx,o+r-wx /etc/tacheron.deny;
+            chmod 744 /etc/tacheron.deny;
         fi
 
         if [ ! -f /var/log/tacheron ];
         then
             touch /var/log/tacheron;
-            chmod u+rwx,g+r-wx,o+r-wx;
+            chmod 777 /var/log/tacheron;
         fi
 else
         echo "La commande doit être effectuée par le root ou un utilisateur autorisé"
@@ -68,11 +68,11 @@ do
         date_reel[6]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f1) #nom du jour reel
         date_reel=$(date +%u-%d-%m-%H-%M-%S)
        
-        user_connecte=$(whoami);
 
         #on boucle sur les utilisateurs de tacheron.allow
         while read user
         do
+                user_connecte=$(whoami);
                 #on boucle sur les fichiers tacherontab[user_connecte] pour lire les commandes
                 while read user_programmeur seconde_virtuel minute_virtuel heure_virtuel jour_virtuel mois_virtuel nom_du_jour_virtuel commande
                 do
