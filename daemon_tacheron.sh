@@ -1,81 +1,23 @@
 #!/bin/bash
 
-#variable couleur pour la mise en page du fichier log
-blanc='\e[1;37m'
-rougefonce='\e[0;31m'
-vertfonce='\e[0;32m'
-orange='\e[0;33m'
-violetclair='\e[1;35m'
-bleu='\e[1;34m'
-#-------------------------------------------------------
 
-#initialisation arborescence 
-if [ "$UID" -eq "0" ] || ( grep "$(whoami)" "/etc/tacheron.allow" ) >/dev/null 2>&1;
-then
-        if [ ! -d /etc/tacheron ]; #verification si le répertoire existe
-        then 
-            mkdir /etc/tacheron;
-            chmod 777 /etc/tacheron;
-        fi
+#fonction
 
-        if [ ! -f /etc/tacherontab ]; #vérification si le fichier pour le root existe
-        then
-            touch /etc/tacherontab;
-            chmod 777 /etc/tacherontab; #on doit autoriser que le root à écrire 
-        fi
-
-        if [ ! -f /etc/tacheron/tacherontab$(whoami) ]; #vérification si le fichier user connecté existe
-        then
-            touch /etc/tacheron/tacherontab$(whoami);
-            chmod 777 /etc/tacheron/tacherontab$(whoami);
-        fi
-
-        if [ ! -f /etc/tacheron.allow ];
-        then    
-            touch /etc/tacheron.allow;
-            chmod 744 /etc/tacheron.allow;
-        fi
-
-        if [ ! -f /etc/tacheron.deny ];
-        then
-            touch /etc/tacheron.deny;
-            chmod 744 /etc/tacheron.deny;
-        fi
-
-        if [ ! -f /var/log/tacheron ];
-        then
-            touch /var/log/tacheron;
-            chmod 777 /var/log/tacheron;
-        fi
-else
-        echo "La commande doit être effectuée par le root ou un utilisateur autorisé"
-        exit 1
-fi
-
-
-#boucle sans fin (à démarrer en processus demon dès l'ouverture du système et en arrière-plan)
-while [ true ]
-do
-        temps_debut_execution=$(date +"%s")
-        touch /etc/tacheron/tacherontabtmp #création d'un fichier qui accueillera les commandes à exécuter de chaque utilisateur
-
-        #tableau pour la date et heure système réelle
-        date_reel[1]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f6) #seconde reel
-        date_reel[2]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f5) #minute reel
-        date_reel[3]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f4) #heure reel
-        date_reel[4]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f2) #jour reel
-        date_reel[5]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f3) #mois reel
-        date_reel[6]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f1) #nom du jour reel
-        date_reel=$(date +%u-%d-%m-%H-%M-%S)
-       
-
-        #on boucle sur les utilisateurs de tacheron.allow
-        while read user
-        do
-                user_connecte=$(whoami);
-                #on boucle sur les fichiers tacherontab[user_connecte] pour lire les commandes
-                while read user_programmeur seconde_virtuel minute_virtuel heure_virtuel jour_virtuel mois_virtuel nom_du_jour_virtuel commande
+executer_commande_tacheron()
+{
+        while read ligne #user_programmeur seconde_virtuel minute_virtuel heure_virtuel jour_virtuel mois_virtuel nom_du_jour_virtuel commande
                 do
+                echo "$ligne" > temp
+                user_programmeur=$(cut -d" " -f1 temp)
+                seconde_virtuel=$(cut -d" " -f2 temp)
+                minute_virtuel=$(cut -d" " -f3 temp)
+                heure_virtuel=$(cut -d" " -f4 temp)
+                jour_virtuel=$(cut -d" " -f5 temp)
+                mois_virtuel=$(cut -d" " -f6 temp)
+                nom_du_jour_virtuel=$(cut -d" " -f7 temp)
+                commande=$(cut -d" " -f8 temp)
+                rm temp
+
                 date_virtuel=$nom_du_jour_virtuel-$jour_virtuel-$mois_virtuel-$heure_virtuel-$minute_virtuel-$seconde_virtuel;
                 execution_commande="vrai";
                 #on teste si le user qui a indiqué la commande a été banni entre deux
@@ -184,7 +126,86 @@ do
                                 echo "$user_programmeur $date_reel $heure_reel $commande" >> "/etc/tacheron/tacherontabtmp" #on indique la commande dans le fichier temporaire qui execute les commandes valides
                         fi
         
-                done < /etc/tacheron/tacherontab$user_connecte #lecture des commandes de tacherontab user connecte
+                done < $1 #lecture des commandes de tacherontab user connecte
+}
+
+#variable couleur pour la mise en page du fichier log
+blanc='\e[1;37m'
+rougefonce='\e[0;31m'
+vertfonce='\e[0;32m'
+orange='\e[0;33m'
+violetclair='\e[1;35m'
+bleu='\e[1;34m'
+#-------------------------------------------------------
+
+#initialisation arborescence 
+if [ "$UID" -eq "0" ] || ( grep "$(whoami)" "/etc/tacheron.allow" ) >/dev/null 2>&1;
+then
+        if [ ! -d /etc/tacheron ]; #verification si le répertoire existe
+        then 
+            mkdir /etc/tacheron;
+            chmod 777 /etc/tacheron;
+        fi
+
+        if [ ! -f /etc/tacherontab ]; #vérification si le fichier pour le root existe
+        then
+            touch /etc/tacherontab;
+            chmod 777 /etc/tacherontab; #on doit autoriser que le root à écrire 
+        fi
+
+        if [ ! -f /etc/tacheron/tacherontab$(whoami) ]; #vérification si le fichier user connecté existe
+        then
+            touch /etc/tacheron/tacherontab$(whoami);
+            chmod 777 /etc/tacheron/tacherontab$(whoami);
+        fi
+
+        if [ ! -f /etc/tacheron.allow ];
+        then    
+            touch /etc/tacheron.allow;
+            chmod 744 /etc/tacheron.allow;
+        fi
+
+        if [ ! -f /etc/tacheron.deny ];
+        then
+            touch /etc/tacheron.deny;
+            chmod 744 /etc/tacheron.deny;
+        fi
+
+        if [ ! -f /var/log/tacheron ];
+        then
+            touch /var/log/tacheron;
+            chmod 777 /var/log/tacheron;
+        fi
+else
+        echo "La commande doit être effectuée par le root ou un utilisateur autorisé"
+        exit 1
+fi
+
+
+#boucle sans fin (à démarrer en processus demon dès l'ouverture du système et en arrière-plan)
+while [ true ]
+do
+        temps_debut_execution=$(date +"%s")
+        touch /etc/tacheron/tacherontabtmp #création d'un fichier qui accueillera les commandes à exécuter de chaque utilisateur
+
+        #tableau pour la date et heure système réelle
+        date_reel[1]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f6) #seconde reel
+        date_reel[2]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f5) #minute reel
+        date_reel[3]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f4) #heure reel
+        date_reel[4]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f2) #jour reel
+        date_reel[5]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f3) #mois reel
+        date_reel[6]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f1) #nom du jour reel
+        date_reel=$(date +%u-%d-%m-%H-%M-%S)
+       
+
+        #on boucle sur les utilisateurs de tacheron.allow
+        while read user
+        do
+                user_connecte=$(whoami);
+                executer_commande_tacheron /etc/tacheron/tacherontab$user_connecte
+                executer_commande_tacheron /etc/tacherontab
+                #on boucle sur les fichiers tacherontab[user_connecte] pour lire les commandes
+                
         done < /etc/tacheron.allow #lecture des utilisateurs autorisés
 
         #exécution des commandes du fichier temporaire

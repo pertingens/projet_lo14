@@ -159,7 +159,7 @@ transformation_argument()
             fi
         fi
     done
-    #cat temp2
+    cat temp2
 
     let "compteur = 1"
     result=$(whoami)
@@ -400,7 +400,7 @@ verif_jourSemaine()
 verif_argument()
 {
     echo "$1" > temp
-    commande=$(cut -d"\"" -f2 temp)
+    
     reste=$(cut -d"\"" -f1 temp)
     createur=$(cut -d" " -f1 temp)
     seconde=$(cut -d" " -f2 temp)
@@ -412,8 +412,10 @@ verif_argument()
     if [ $(cut -d" " -f8 temp) = "-u" ] || [ $(cut -d" " -f8 temp) = "--user" ]
     then
         user=$(cut -d" " -f9 temp)
+        commande=$(cut -d" " -f10- temp)
     else
         user=""
+        commande=$(cut -d" " -f8- temp)
     fi
     rm temp
 
@@ -459,7 +461,7 @@ verif_argument()
         exit
     fi
 
-    if [ $user != "" ]
+    if [ "$user" != "" ]
     then
         if [ "$(verif_user "$user")" = "false" ]
         then
@@ -577,136 +579,170 @@ edite_fichier()
     cat temp2 > $1
 }
 
-#initialisation
+if [ ! -e fichierInitialisation ]
+then
+    touch fichierInitialisation
+    chmod 777 fichierInitialisation
 
-if [ $# -eq 1 ]
-then 
-    if [ $1 = "help" ]
+    if [ $# -eq 1 ]
     then
-        help 
-    elif [ $1 = "-l" ] || [ $1 = "--aff" ]
-    then
-        if [ $(verifier_tacherontab "/etc/tacherontab") = "true" ]
+        if [ $1 = "-i" ] || [ $1 = "--init" ]
         then
-            cat  /etc/tacherontab
+            initialisation
+            echo "1">fichierInitialisation
         else
-            erreur_fichier_inexistant "/etc/tacherontab"
+            echo "veuillez initialiser tacheron"
+            exit 0
         fi
-    elif [ $1 = "-r" ] || [ $1 = "--rem" ]
-    then
-        if [ $(verifier_tacherontab "/etc/tacherontab") = "true" ]
+    else
+        echo "veuillez initialiser tacheron"
+        exit 0
+    fi
+elif [ "$(cat fichierInitialisation)" = "1" ]
+then
+    if [ $# -eq 1 ]
+    then 
+        if [ $1 = "help" ]
         then
-            rm  /etc/tacherontab
-        else
-            erreur_fichier_inexistant "/etc/tacherontab"
-        fi
-    elif [ $1 = "-e"  ] || [ $1 = "--edit" ]
-    then
-        if [ $(verif_createur whoami) = "true" ]
+            help 
+        elif [ $1 = "-l" ] || [ $1 = "--aff" ]
         then
             if [ $(verifier_tacherontab "/etc/tacherontab") = "true" ]
             then
-                edite_fichier "/etc/tacherontab"
+                cat  /etc/tacherontab
             else
                 erreur_fichier_inexistant "/etc/tacherontab"
             fi
-        else
-            erreur_permission
-        fi
-    elif [ $1 = "-d"  ] || [ $1 = "--dell" ]
-    then
-        suppression
-    else
-        erreur_saisie
-    fi  
-elif [ $# -eq 2 ]
-then
-    if [ $1 = "help" ]
-    then
-        if [ $2 = "-l" ] || [ $2 = "--aff" ]
+        elif [ $1 = "-r" ] || [ $1 = "--rem" ]
         then
-            help_affiche
-        elif [ $2 = "-e" ] || [ $2 = "--edit" ]
-        then 
-            help_edite
-        elif [ $2 = "-r" ] || [ $2 = "--rem" ]
+            if [ $(verifier_tacherontab "/etc/tacherontab") = "true" ]
+            then
+                rm  /etc/tacherontab
+            else
+                erreur_fichier_inexistant "/etc/tacherontab"
+            fi
+        elif [ $1 = "-e"  ] || [ $1 = "--edit" ]
         then
-            help_remove
-        elif [ $2 = "-d" ] || [ $2 = "--dell" ]
-        then 
-            help_suppr
+            if [ $(verif_createur whoami) = "true" ]
+            then
+                if [ $(verifier_tacherontab "/etc/tacherontab") = "true" ]
+                then
+                    edite_fichier "/etc/tacherontab"
+                else
+                    erreur_fichier_inexistant "/etc/tacherontab"
+                fi
+            else
+                erreur_permission
+            fi
+        elif [ $1 = "-d"  ] || [ $1 = "--dell" ]
+        then
+            suppression
         else
             erreur_saisie
-        fi
-    else
-       erreur_saisie
-    fi
-elif [ $# -eq 3 ]
-then
-    if [ $1 = "--user" ] || [ $1 = "-u" ]
+        fi  
+    elif [ $# -eq 2 ]
     then
-        cat /etc/passwd | cut -d ":" -f 1 > temp
-        userTemp = grep -c ^$2$ temp
-        rm temp
-
-        if [ $userTemp -eq 1 ]
-        then 
-            if [ $1 = "-l" ] || [ $1 = "--aff" ]
+        if [ $1 = "help" ]
+        then
+            if [ $2 = "-l" ] || [ $2 = "--aff" ]
             then
-                if [ $(verifier_tacherontab "/etc/tacheron/tacherontab$2") = "true" ]
-                then
-                    cat  "/etc/tacheron/tacherontab$2"
-                else
-                    erreur_fichier_inexistant "/etc/tacheron/tacherontab$2"
-                fi
-            elif [ $1 = "-r" ] || [ $1 = "--rem" ]
+                help_affiche
+            elif [ $2 = "-e" ] || [ $2 = "--edit" ]
+            then 
+                help_edite
+            elif [ $2 = "-r" ] || [ $2 = "--rem" ]
             then
-                if [ $(verifier_tacherontab "/etc/tacheron/tacherontab$2") = "true" ]
-                then
-                    rm  "/etc/tacheron/tacherontab$2"
-                else
-                    erreur_fichier_inexistant "/etc/tacheron/tacherontab$2"
-                fi
-            elif [ $1 = "-e"  ] || [ $1 = "--edit" ]
-            then
-                if [ $(verif_createur whoami) = "true" ]
-                then
-                    if [ $(verifier_tacherontab "/etc/tacheron/tacherontab$2") = "true" ]
-                    then
-                        edite_fichier "/etc/tacheron/tacherontab$2"
-                    else
-                        erreur_fichier_inexistant "/etc/tacheron/tacherontab$2"
-                    fi
-                else
-                    erreur_permission
-                fi
+                help_remove
+            elif [ $2 = "-d" ] || [ $2 = "--dell" ]
+            then 
+                help_suppr
             else
                 erreur_saisie
             fi
         else
-           erreur_saisie
-        fi
-    else
         erreur_saisie
-    fi
-elif [ $# -ge 7 ]
-then
-    result=$(transformation_argument $@)
-    
-    if [ $(verif_argument "$result") = "true" ]
+        fi
+    elif [ $# -eq 3 ]
     then
-        if [ $(recuperation_user $@) != "" ]
+        if [ $1 = "--user" ] || [ $1 = "-u" ]
         then
-            user=$(recuperation_user $@)
-            echo "$result" >> "/etc/tacheron/tacherontab$user"
+            cat /etc/passwd | cut -d ":" -f 1 > temp
+            userTemp = grep -c ^$2$ temp
+            rm temp
+
+            if [ $userTemp -eq 1 ]
+            then 
+                if [ $1 = "-l" ] || [ $1 = "--aff" ]
+                then
+                    if [ $(verifier_tacherontab "/etc/tacheron/tacherontab$2") = "true" ]
+                    then
+                        cat  "/etc/tacheron/tacherontab$2"
+                    else
+                        erreur_fichier_inexistant "/etc/tacheron/tacherontab$2"
+                    fi
+                elif [ $1 = "-r" ] || [ $1 = "--rem" ]
+                then
+                    if [ $(verifier_tacherontab "/etc/tacheron/tacherontab$2") = "true" ]
+                    then
+                        rm  "/etc/tacheron/tacherontab$2"
+                    else
+                        erreur_fichier_inexistant "/etc/tacheron/tacherontab$2"
+                    fi
+                elif [ $1 = "-e"  ] || [ $1 = "--edit" ]
+                then
+                    if [ $(verif_createur whoami) = "true" ]
+                    then
+                        if [ $(verifier_tacherontab "/etc/tacheron/tacherontab$2") = "true" ]
+                        then
+                            edite_fichier "/etc/tacheron/tacherontab$2"
+                        else
+                            erreur_fichier_inexistant "/etc/tacheron/tacherontab$2"
+                        fi
+                    else
+                        erreur_permission
+                    fi
+                else
+                    erreur_saisie
+                fi
+            else
+            erreur_saisie
+            fi
         else
-            echo "$result" >> "/etc/tacherontab"
+            erreur_saisie
+        fi
+    elif [ $# -ge 7 ]
+    then
+        result=$(transformation_argument $@)
+        if [ $(verif_argument "$result") = "true" ]
+        then
+            if [ "$(recuperation_user $@)" != "" ]
+            then
+                user=$(recuperation_user $@)
+                echo "$result" >> "/etc/tacheron/tacherontab$user"
+            else
+                echo "$result" >> "/etc/tacherontab"
+            fi
+        else
+            erreur_saisie
         fi
     else
-        erreur_saisie
-    fi
+    erreur_saisie
+    fi 
 else
-   erreur_saisie
-fi 
+    if [ $# -eq 1 ]
+    then
+        if [ $1 = "-i" ] || [ $1 = "--init" ]
+        then
+            initialisation
+            echo "1">fichierInitialisation
+        else
+            echo "veuillez initialiser tacheron"
+            exit 0
+        fi
+    else
+        echo "veuillez initialiser tacheron"
+        exit 0
+    fi
+fi
 
 
