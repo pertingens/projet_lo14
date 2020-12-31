@@ -1,6 +1,5 @@
 #!/bin/bash
-
-#projet lo14
+#fichier pour la commande tacheron
 
 #affichage en cas d'erreur de saisie
 erreur_saisie()
@@ -475,12 +474,6 @@ verif_argument()
        
 }
 
-#seul le root peut initialiser la commmande
-#vérifier que les répertoire existe
-#si oui alors fin de l'initialisation
-#sinon 
-#création au bon endroit
-#donner tous les droits au root et adapter les droits pour les autres utilisateurs
 initialisation()
 {
     if [ "$UID" -eq "0" ] || ( grep "$(whoami)" "/etc/tacheron.allow" ) >/dev/null 2>&1;
@@ -507,6 +500,7 @@ initialisation()
             then    
                 touch /etc/tacheron.allow;
                 chmod 744 /etc/tacheron.allow;
+                echo "root" > /etc/tacheron.allow
             fi
 
             if [ ! -f /etc/tacheron.deny ];
@@ -517,8 +511,12 @@ initialisation()
 
             if [ ! -f /var/log/tacheron ];
             then
-                touch /var/log/tacheron;
+                sudo chmod 777 /var/log;
+                sudo touch /var/log/tacheron;
                 chmod 777 /var/log/tacheron;
+                echo "-----------------------------------------------" > /var/log/tacheron
+                echo "      HISTORIQUE DE LA COMMANDE TACHERON       " >> /var/log/tacheron
+                echo "-----------------------------------------------" >> /var/log/tacheron
             fi
     else
             echo "La commande doit être effectuée par le root ou un utilisateur autorisé"

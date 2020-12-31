@@ -1,15 +1,68 @@
 #!/bin/bash
 
+#variable couleur pour la mise en page du fichier log
+blanc='\e[1;37m'
+rougefonce='\e[0;31m'
+vertfonce='\e[0;32m'
+orange='\e[0;33m'
+violetclair='\e[1;35m'
+bleu='\e[1;34m'
+#-------------------------------------------------------
 
-#fonction
+#initialisation arborescence 
+if [ "$UID" -eq "0" ] || ( grep "$(whoami)" "/etc/tacheron.allow" ) >/dev/null 2>&1;
+then
+        if [ ! -d /etc/tacheron ]; #verification si le répertoire existe
+        then 
+            mkdir /etc/tacheron;
+            chmod 777 /etc/tacheron;
+        fi
 
+        if [ ! -f /etc/tacherontab ]; #vérification si le fichier pour le root existe
+        then
+            touch /etc/tacherontab;
+            chmod 777 /etc/tacherontab; #on doit autoriser que le root à écrire 
+        fi
+
+        if [ ! -f /etc/tacheron/tacherontab$(whoami) ]; #vérification si le fichier user connecté existe
+        then
+            touch /etc/tacheron/tacherontab$(whoami);
+            chmod 777 /etc/tacheron/tacherontab$(whoami);
+        fi
+
+        if [ ! -f /etc/tacheron.allow ];
+        then    
+            touch /etc/tacheron.allow;
+            chmod 744 /etc/tacheron.allow;
+            echo "root" > /etc/tacheron.allow
+        fi
+
+        if [ ! -f /etc/tacheron.deny ];
+        then
+            touch /etc/tacheron.deny;
+            chmod 744 /etc/tacheron.deny;
+        fi
+
+        if [ ! -f /var/log/tacheron ];
+        then
+            sudo chmod 777 /var/log;
+            sudo touch /var/log/tacheron;
+            chmod 777 /var/log/tacheron;
+            echo "-----------------------------------------------" > /var/log/tacheron
+            echo "      HISTORIQUE DE LA COMMANDE TACHERON       " >> /var/log/tacheron
+            echo "-----------------------------------------------" >> /var/log/tacheron
+        fi
+else
+        echo "La commande doit être effectuée par le root ou un utilisateur autorisé"
+        exit 1
+fi
+
+#fonction principale
 executer_commande_tacheron()
 {
         while read user_programmeur seconde_virtuel minute_virtuel heure_virtuel jour_virtuel mois_virtuel nom_du_jour_virtuel commande
         do
                 commande="$(echo $commande | sed s/\"//g)" #supprime les " autour de la commande
-                echo "commande= $commande"
-
                 date_virtuel=$nom_du_jour_virtuel-$jour_virtuel-$mois_virtuel-$heure_virtuel-$minute_virtuel-$seconde_virtuel;
                 execution_commande="vrai";
                 #on teste si le user qui a indiqué la commande a été banni entre deux
@@ -121,59 +174,6 @@ executer_commande_tacheron()
                 done < $1 #lecture des commandes de tacherontab user connecte
 }
 
-#variable couleur pour la mise en page du fichier log
-blanc='\e[1;37m'
-rougefonce='\e[0;31m'
-vertfonce='\e[0;32m'
-orange='\e[0;33m'
-violetclair='\e[1;35m'
-bleu='\e[1;34m'
-#-------------------------------------------------------
-
-#initialisation arborescence 
-if [ "$UID" -eq "0" ] || ( grep "$(whoami)" "/etc/tacheron.allow" ) >/dev/null 2>&1;
-then
-        if [ ! -d /etc/tacheron ]; #verification si le répertoire existe
-        then 
-            mkdir /etc/tacheron;
-            chmod 777 /etc/tacheron;
-        fi
-
-        if [ ! -f /etc/tacherontab ]; #vérification si le fichier pour le root existe
-        then
-            touch /etc/tacherontab;
-            chmod 777 /etc/tacherontab; #on doit autoriser que le root à écrire 
-        fi
-
-        if [ ! -f /etc/tacheron/tacherontab$(whoami) ]; #vérification si le fichier user connecté existe
-        then
-            touch /etc/tacheron/tacherontab$(whoami);
-            chmod 777 /etc/tacheron/tacherontab$(whoami);
-        fi
-
-        if [ ! -f /etc/tacheron.allow ];
-        then    
-            touch /etc/tacheron.allow;
-            chmod 744 /etc/tacheron.allow;
-        fi
-
-        if [ ! -f /etc/tacheron.deny ];
-        then
-            touch /etc/tacheron.deny;
-            chmod 744 /etc/tacheron.deny;
-        fi
-
-        if [ ! -f /var/log/tacheron ];
-        then
-            touch /var/log/tacheron;
-            chmod 777 /var/log/tacheron;
-        fi
-else
-        echo "La commande doit être effectuée par le root ou un utilisateur autorisé"
-        exit 1
-fi
-
-
 #boucle sans fin (à démarrer en processus demon dès l'ouverture du système et en arrière-plan)
 while [ true ]
 do
@@ -196,29 +196,31 @@ do
                 user_connecte=$(whoami);
                 executer_commande_tacheron /etc/tacheron/tacherontab$user_connecte
                 executer_commande_tacheron /etc/tacherontab
-                #on boucle sur les fichiers tacherontab[user_connecte] pour lire les commandes
+                #on boucle sur les fichiers tacherontab[user_connecte] et root pour lire les commandes
                 
-        done < /etc/tacheron.allow #lecture des utilisateurs autorisés
-
+                i=0
         #exécution des commandes du fichier temporaire
-        while read user_programmeur date_reel heure_reel commande
-        do
-                if [[ -n $commande ]]; #permet la résolution d'un problème d'écriture dans tmp
-                then
-                        sudo $commande #affichage commande sur la sortie standard s'il y a lieu
-                        if [ $? -eq 0 ];
+                while read user_programmeur date_reel heure_reel commande
+                do
+                        if [[ -n $commande ]]; #permet la résolution d'un problème d'écriture dans tmp
                         then
-                                echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${vertfonce}[Réussi]${blanc}\n" >> /var/log/tacheron
-                                #on écrit dans le fichier log historique ok
+                                let "i++"
+                                sudo $commande 2>/dev/null; #affichage commande sur la sortie standard s'il y a lieu
+                                echo -e "$i\n"
+                                if [ $? -eq 0 ];
+                                then
+                                        echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${vertfonce}[Réussi]${blanc}\n" >> /var/log/tacheron
+                                        #on écrit dans le fichier log historique ok
+                                else
+                                        error=$($commande 2>&1); #on récupère le message d'erreur dans une variable
+                                        echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${rougefonce}[ECHEC] ${blanc}Erreur: $error \n" >> /var/log/tacheron
+                                fi
                         else
-                                error=$($commande 2>&1); #on récupère le message d'erreur dans une variable
-                                echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${rougefonce}[ECHEC] ${blanc}Erreur: $error \n" >> /var/log/tacheron
+                                break
                         fi
-                else
-                        break
-                fi
 
-        done < /etc/tacheron/tacherontabtmp
+                done < /etc/tacheron/tacherontabtmp
+        done < /etc/tacheron.allow #lecture des utilisateurs autorisés
 
         #suppression du fichier temporaire quand les commandes sont exécutées
         if [ -f /etc/tacheron/tacherontabtmp ];
