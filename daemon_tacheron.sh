@@ -9,6 +9,49 @@ violetclair='\e[1;35m'
 bleu='\e[1;34m'
 #-------------------------------------------------------
 
+#initialisation arborescence 
+if [ "$UID" -eq "0" ] || ( grep "$(whoami)" "/etc/tacheron.allow" ) >/dev/null 2>&1;
+then
+        if [ ! -d /etc/tacheron ]; #verification si le répertoire existe
+        then 
+            mkdir /etc/tacheron;
+            chmod u+rwx,g+r-wx,o+r-wx /etc/tacheron;
+        fi
+
+        if [ ! -f /etc/tacherontab ]; #vérification si le fichier pour le root existe
+        then
+            touch /etc/tacherontab;
+            chmod u+rwx,g+r-wx,o+r-wx /etc/tacherontab; #on doit autoriser que le root à écrire 
+        fi
+
+        if [ ! -f /etc/tacheron/tacherontab$(whoami) ]; #vérification si le fichier user connecté existe
+        then
+                touch /etc/tacheron/tacherontab$(whoami);
+                chmod u+rwx,g+rwx,o+r-wx;
+        fi
+
+        if [ ! -f /etc/tacheron.allow ];
+        then    
+            touch /etc/tacheron.allow;
+            chmod u+rwx,g+r-wx,o+r-wx /etc/tacheron.allow;
+        fi
+
+        if [ ! -f /etc/tacheron.deny ];
+        then
+            touch /etc/tacheron.deny;
+            chmod u+rwx,g+r-wx,o+r-wx /etc/tacheron.deny;
+        fi
+
+        if [ ! -f /var/log/tacheron ];
+        then
+            touch /var/log/tacheron;
+            chmod u+rwx,g+r-wx,o+r-wx;
+        fi
+else
+        echo "La commande doit être effectuée par le root ou un utilisateur autorisé"
+        exit 1
+fi
+
 
 #boucle sans fin (à démarrer en processus demon dès l'ouverture du système et en arrière-plan)
 while [ true ]
@@ -25,10 +68,12 @@ do
         date_reel[6]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f1) #nom du jour reel
         date_reel=$(date +%u-%d-%m-%H-%M-%S)
        
+        user_connecte=$(whoami);
+
         #on boucle sur les utilisateurs de tacheron.allow
         while read user
         do
-                #on boucle sur le fichier tacherontab[user] pour lire les commandes
+                #on boucle sur les fichiers tacherontab[user_connecte] pour lire les commandes
                 while read user_programmeur seconde_virtuel minute_virtuel heure_virtuel jour_virtuel mois_virtuel nom_du_jour_virtuel commande
                 do
                 date_virtuel=$nom_du_jour_virtuel-$jour_virtuel-$mois_virtuel-$heure_virtuel-$minute_virtuel-$seconde_virtuel;
@@ -139,7 +184,7 @@ do
                                 echo "$user_programmeur $date_reel $heure_reel $commande" >> "/etc/tacheron/tacherontabtmp" #on indique la commande dans le fichier temporaire qui execute les commandes valides
                         fi
         
-                done < /etc/tacherontab$user #lecture des commandes de tacherontab
+                done < /etc/tacheron/tacherontab$user_connecte #lecture des commandes de tacherontab user connecte
         done < /etc/tacheron.allow #lecture des utilisateurs autorisés
 
         #exécution des commandes du fichier temporaire
