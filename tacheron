@@ -481,59 +481,46 @@ verif_argument()
 #donner tous les droits au root et adapter les droits pour les autres utilisateurs
 initialisation()
 {
-    if [ "$UID" -ne "0" ]
+    if [ "$UID" -eq "0" ] || ( grep "$(whoami)" "/etc/tacheron.allow" ) >/dev/null 2>&1;
     then
-        echo "L'initialisation de la commande doit être effectuée par le root"
-        exit 1
+            if [ ! -d /etc/tacheron ]; #verification si le répertoire existe
+            then 
+                mkdir /etc/tacheron;
+                chmod 777 /etc/tacheron;
+            fi
+
+            if [ ! -f /etc/tacherontab ]; #vérification si le fichier pour le root existe
+            then
+                touch /etc/tacherontab;
+                chmod 777 /etc/tacherontab; #on doit autoriser que le root à écrire 
+            fi
+
+            if [ ! -f /etc/tacheron/tacherontab$(whoami) ]; #vérification si le fichier user connecté existe
+            then
+                touch /etc/tacheron/tacherontab$(whoami);
+                chmod 777 /etc/tacheron/tacherontab$(whoami);
+            fi
+
+            if [ ! -f /etc/tacheron.allow ];
+            then    
+                touch /etc/tacheron.allow;
+                chmod 744 /etc/tacheron.allow;
+            fi
+
+            if [ ! -f /etc/tacheron.deny ];
+            then
+                touch /etc/tacheron.deny;
+                chmod 744 /etc/tacheron.deny;
+            fi
+
+            if [ ! -f /var/log/tacheron ];
+            then
+                touch /var/log/tacheron;
+                chmod 777 /var/log/tacheron;
+            fi
     else
-        if [ ! -d /etc/tacheron ]; #verification si le répertoire existe
-        then 
-            mkdir /etc/tacheron;
-            chmod u+rw-x,g+rw-x,o+rw-x /etc/tacheron;
-            echo "répertoire tacheron créé";
-        else
-            echo "répertoire tacheron déjà créé";
-            exit 0
-        fi
-
-        if [ ! -f /etc/tacherontab ]; #vérification si le fichier existe
-        then
-            touch /etc/tacherontab;
-            echo "fichier tacherontab créé";
-            chmod u+rwx,g-rwx,o-rwx /etc/tacherontab; #on doit autoriser que le root et les users de tacheron.allow à lire et écrire 
-        else
-            echo "fichier tacherontab déjà créé";
-            exit 0
-        fi
-
-        if [ ! -f /etc/tacheron.allow ];
-        then    
-            touch /etc/tacheron.allow;
-            echo "fichier user autorisé créé";
-            chmod u+rwx,g-rwx,o-rwx /etc/tacheron.allow;
-        else
-            echo "fichier tacheron.allow déjà créé";
-            exit 0
-        fi
-
-        if [ ! -f /etc/tacheron.deny ];
-        then
-            touch /etc/tacheron.deny;
-            echo "fichier user non autorisé créé";
-            chmod u+rwx,g-rwx,o-rwx /etc/tacheron.deny;
-        else
-            echo "fichier user non autorisé déjà créé";
-            exit 0
-        fi
-
-        if [ ! -f /var/log/tacheron ];
-        then
-            touch /var/log/tacheron;
-            echo "fichier historique créé"
-        else
-            echo "fichier historique déjà créé";
-            exit 0
-        fi
+            echo "La commande doit être effectuée par le root ou un utilisateur autorisé"
+            exit 1
     fi
 }
 
