@@ -205,8 +205,8 @@ do
                         if [[ -n $commande ]]; #permet la résolution d'un problème d'écriture dans tmp
                         then
                                 let "i++"
-                                sudo $commande 2>/dev/null; #affichage commande sur la sortie standard s'il y a lieu
                                 echo -e "$i\n"
+                                sudo $commande 2>/dev/null; #affichage commande sur la sortie standard s'il y a lieu
                                 if [ $? -eq 0 ];
                                 then
                                         echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${vertfonce}[Réussi]${blanc}\n" >> /var/log/tacheron
