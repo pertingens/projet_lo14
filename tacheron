@@ -158,7 +158,7 @@ transformation_argument()
             fi
         fi
     done
-    cat temp2
+    #cat temp2
 
     let "compteur = 1"
     result=$(whoami)
@@ -398,78 +398,83 @@ verif_jourSemaine()
 
 verif_argument()
 {
-    echo "$1" > temp
-    
-    reste=$(cut -d"\"" -f1 temp)
-    createur=$(cut -d" " -f1 temp)
-    seconde=$(cut -d" " -f2 temp)
-    minutes=$(cut -d" " -f3 temp)
-    heures=$(cut -d" " -f4 temp)
-    jourDuMois=$(cut -d" " -f5 temp)
-    moisDeAnnee=$(cut -d" " -f6 temp)
-    jourSemaine=$(cut -d" " -f7 temp)
-    if [ $(cut -d" " -f8 temp) = "-u" ] || [ $(cut -d" " -f8 temp) = "--user" ]
+    echo "$1" > tempargument
+    verif_argument_result="true"
+    reste=$(cut -d"\"" -f1 tempargument)
+    createur=$(cut -d" " -f1 tempargument)
+    seconde=$(cut -d" " -f2 tempargument)
+    minutes=$(cut -d" " -f3 tempargument)
+    heures=$(cut -d" " -f4 tempargument)
+    jourDuMois=$(cut -d" " -f5 tempargument)
+    moisDeAnnee=$(cut -d" " -f6 tempargument)
+    jourSemaine=$(cut -d" " -f7 tempargument)
+    if [ $(cut -d" " -f8 tempargument) = "-u" ] || [ $(cut -d" " -f8 tempargument) = "--user" ]
     then
-        user=$(cut -d" " -f9 temp)
-        commande=$(cut -d" " -f10- temp)
+        user=$(cut -d" " -f9 tempargument)
+        commande=$(cut -d" " -f10- tempargument)
     else
         user=""
-        commande=$(cut -d" " -f8- temp)
+        commande=$(cut -d" " -f8- tempargument)
     fi
-    rm temp
+    rm tempargument
+    test=$(echo "$1" | wc -w)
+    if [ $(($test))  -lt 8 ]
+    then 
+        verif_argument_result="false"
+    fi
 
     if [ $(verif_createur "$createur") = "false" ]
     then
-        echo "Vous n'avez pas l'autorisation de créer des commandes, veuillez concater votre administrateur"
-        exit
+        #echo "Vous n'avez pas l'autorisation de créer des commandes, veuillez concater votre administrateur"
+        verif_argument_result="false"
     fi
 
     if [ "$(verif_seconde "$seconde")" = "false" ]
     then
-       echo "le Champs temporel des secondes \"$seconde\" n'est pas conforme"
-       exit
+       #echo "le Champs temporel des secondes \"$seconde\" n'est pas conforme"
+       verif_argument_result="false"
     fi
 
     if [ "$(verif_minute "$minutes")" = "false" ]
     then
-       echo "le Champs temporel des minutes \"$minutes\" n'est pas conforme"
-       exit
+       #echo "le Champs temporel des minutes \"$minutes\" n'est pas conforme"
+       verif_argument_result="false"
     fi
 
     if [ "$(verif_heure "$heures")" = "false" ]
     then
-        echo "le Champs temporel des heures \"$heures\" n'est pas conforme"
-        exit
+        #echo "le Champs temporel des heures \"$heures\" n'est pas conforme"
+        verif_argument_result="false"
     fi
 
     if [ "$(verif_jourDuMois "$jourDuMois")" = "false" ]
     then
-        echo "le Champs temporel des jours du mois \"$jourDuMois\" n'est pas conforme"
-        exit
+        #echo "le Champs temporel des jours du mois \"$jourDuMois\" n'est pas conforme"
+        verif_argument_result="false"
     fi
 
     if [ "$(verif_moisDeAnnee "$moisDeAnnee")" = "false" ]
     then
-        echo "le Champs temporel des mois de l'année \"$moisDeAnnee\" n'est pas conforme"
-        exit
+        #echo "le Champs temporel des mois de l'année \"$moisDeAnnee\" n'est pas conforme"
+        verif_argument_result="false"
     fi
 
     if [ "$(verif_jourSemaine "$jourSemaine")" = "false" ]
     then
-        echo "le Champs temporel des jours de la semaine \"$jourSemaine\" n'est pas conforme"
-        exit
+        #echo "le Champs temporel des jours de la semaine \"$jourSemaine\" n'est pas conforme"
+        verif_argument_result="false"
     fi
 
     if [ "$user" != "" ]
     then
         if [ "$(verif_user "$user")" = "false" ]
         then
-            echo "Erreur : l'utilisateur \"$user\" n'exite pas sur cette machine"
-            exit
+            #echo "Erreur : l'utilisateur \"$user\" n'exite pas sur cette machine"
+            verif_argument_result="false"
         fi
     fi
 
-    echo "true"
+    echo "$verif_argument_result"
 
        
 }
@@ -561,20 +566,25 @@ suppression()
 edite_fichier()
 {
     cat $1 > temp
-    vi temp
-    let "compteur = 0"
-    while read ligne
+    vi temp 
+    #cat temp
+    let "compteur = 1"
+    cat temp | while read ligne
     do
-        if [ $(verif_argument "$ligne") = "false" ]
+        test=$(verif_argument "$ligne")
+        if [  "$test" = "false" ]
         then
             echo "la ligne $compteur n'est pas conforme : \"$ligne\""
         else
+            echo "ajouté : $ligne"
             echo "$ligne">>temp2
         fi
         let "compteur = $compteur + 1"
-    done < temp
-    rm temp
+    done
+    
     cat temp2 > $1
+    rm temp
+    rm temp2
 }
 
 if [ ! -e fichierInitialisation ]
@@ -621,11 +631,11 @@ then
             fi
         elif [ $1 = "-e"  ] || [ $1 = "--edit" ]
         then
-            if [ $(verif_createur whoami) = "true" ]
+            if [ $(verif_createur $(whoami)) = "true" ]
             then
                 if [ $(verifier_tacherontab "/etc/tacherontab") = "true" ]
                 then
-                    edite_fichier "/etc/tacherontab"
+                    edite_fichier /etc/tacherontab
                 else
                     erreur_fichier_inexistant "/etc/tacherontab"
                 fi
@@ -711,6 +721,7 @@ then
     elif [ $# -ge 7 ]
     then
         result=$(transformation_argument $@)
+        #echo "$result"
         if [ $(verif_argument "$result") = "true" ]
         then
             if [ "$(recuperation_user $@)" != "" ]
