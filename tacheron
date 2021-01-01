@@ -32,7 +32,7 @@ help_affiche()
 {
     echo "aff - affiche le fichier tacherontab"
     echo "--aff"
-    echo "-l" 
+    echo "-a" 
 }
 
 help_remove()
@@ -613,7 +613,7 @@ then
         if [ $1 = "help" ]
         then
             help 
-        elif [ $1 = "-l" ] || [ $1 = "--aff" ]
+        elif [ $1 = "-a" ] || [ $1 = "--aff" ]
         then
             if [ $(verifier_tacherontab "/etc/tacherontab") = "true" ]
             then
@@ -629,6 +629,9 @@ then
             else
                 erreur_fichier_inexistant "/etc/tacherontab"
             fi
+        elif [ $1 = "-l"  ] || [ $1 = "--log" ]
+        then
+            cat "/var/log/tacheron"
         elif [ $1 = "-e"  ] || [ $1 = "--edit" ]
         then
             if [ $(verif_createur $(whoami)) = "true" ]
