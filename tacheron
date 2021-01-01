@@ -673,14 +673,10 @@ then
     elif [ $# -eq 3 ]
     then
         if [ $1 = "--user" ] || [ $1 = "-u" ]
-        then
-            cat /etc/passwd | cut -d ":" -f 1 > temp
-            userTemp = grep -c ^$2$ temp
-            rm temp
-
-            if [ $userTemp -eq 1 ]
+        then      
+            if [ $(verif_user "$2") = "true" ]
             then 
-                if [ $1 = "-l" ] || [ $1 = "--aff" ]
+                if [ $3 = "-l" ] || [ $3 = "--aff" ]
                 then
                     if [ $(verifier_tacherontab "/etc/tacheron/tacherontab$2") = "true" ]
                     then
@@ -688,7 +684,7 @@ then
                     else
                         erreur_fichier_inexistant "/etc/tacheron/tacherontab$2"
                     fi
-                elif [ $1 = "-r" ] || [ $1 = "--rem" ]
+                elif [ $3 = "-r" ] || [ $3 = "--rem" ]
                 then
                     if [ $(verifier_tacherontab "/etc/tacheron/tacherontab$2") = "true" ]
                     then
@@ -696,9 +692,9 @@ then
                     else
                         erreur_fichier_inexistant "/etc/tacheron/tacherontab$2"
                     fi
-                elif [ $1 = "-e"  ] || [ $1 = "--edit" ]
+                elif [ $3 = "-e"  ] || [ $3 = "--edit" ]
                 then
-                    if [ $(verif_createur whoami) = "true" ]
+                    if [ $(verif_createur $(whoami)) = "true" ]
                     then
                         if [ $(verifier_tacherontab "/etc/tacheron/tacherontab$2") = "true" ]
                         then
