@@ -637,7 +637,10 @@ then
                 then
                     edite_fichier /etc/tacherontab
                 else
-                    erreur_fichier_inexistant "/etc/tacherontab"
+                    echo "le fichier \"/etc/tacherontab\" n'existe pas encore, nous allons le créer"
+                    touch "/etc/tacherontab"
+                    chmod 777 "/etc/tacherontab"
+                    edite_fichier "/etc/tacherontab"
                 fi
             else
                 erreur_permission
@@ -700,7 +703,10 @@ then
                         then
                             edite_fichier "/etc/tacheron/tacherontab$2"
                         else
-                            erreur_fichier_inexistant "/etc/tacheron/tacherontab$2"
+                            echo "le fichier \"/etc/tacheron/tacherontab$2\" n'existe pas encore, nous allons le créer"
+                            touch "/etc/tacheron/tacherontab$2"
+                            chmod 777 "/etc/tacheron/tacherontab$2"
+                            edite_fichier "/etc/tacheron/tacherontab$2"
                         fi
                     else
                         erreur_permission
