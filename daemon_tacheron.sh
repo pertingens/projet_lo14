@@ -189,44 +189,43 @@ do
         date_reel[6]=$(date +%u-%d-%m-%H-%M-%S | cut -d'-' -f1) #nom du jour reel
         date_reel=$(date +%u-%d-%m-%H-%M-%S)
        
-
-        #on boucle sur les utilisateurs de tacheron.allow
-        while read user
-        do
-                user_connecte=$(whoami);
+        
+        user_connecte=$(whoami);
+        #vérification si l'utilisateur_connecte est dans la liste des personnes autorisés
+        if ( grep "$user_connecte" "/etc/tacheron.allow" ) >/dev/null 2>&1; #permet de ne pas afficher le grep 
+        then
                 executer_commande_tacheron /etc/tacheron/tacherontab$user_connecte
                 executer_commande_tacheron /etc/tacherontab
-                #on boucle sur les fichiers tacherontab[user_connecte] et root pour lire les commandes
-                
-                i=0
-        #exécution des commandes du fichier temporaire
-                while read user_programmeur date_reel heure_reel commande
-                do
-                        if [[ -n $commande ]]; #permet la résolution d'un problème d'écriture dans tmp
-                        then
-                                let "i++"
-                                echo -e "$i\n"
-                                sudo $commande 2>/dev/null; #affichage commande sur la sortie standard s'il y a lieu
-                                if [ $? -eq 0 ];
-                                then
-                                        echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${vertfonce}[Réussi]${blanc}\n" >> /var/log/tacheron
-                                        #on écrit dans le fichier log historique ok
-                                else
-                                        error=$($commande 2>&1); #on récupère le message d'erreur dans une variable
-                                        echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${rougefonce}[ECHEC] ${blanc}Erreur: $error \n" >> /var/log/tacheron
-                                fi
-                        else
-                                break
-                        fi
+        else #sinon on exécute seulement les tâches de root
+                executer_commande_tacheron /etc/tacherontab
+        fi
 
-                done < /etc/tacheron/tacherontabtmp
-        done < /etc/tacheron.allow #lecture des utilisateurs autorisés
+        #exécution des commandes du fichier temporaire
+        while read user_programmeur date_reel heure_reel commande
+        do
+                if [[ -n $commande ]]; #permet la résolution d'un problème d'écriture dans tmp
+                then
+                        sudo $commande 2>/dev/null; #affichage commande sur la sortie standard s'il y a lieu
+                        if [ $? -eq 0 ];
+                        then
+                                echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${vertfonce}[Réussi]${blanc}\n" >> /var/log/tacheron
+                                #on écrit dans le fichier log historique ok
+                        else
+                                error=$($commande 2>&1); #on récupère le message d'erreur dans une variable
+                                echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${rougefonce}[ECHEC] ${blanc}Erreur: $error \n" >> /var/log/tacheron
+                        fi
+                else
+                        break
+                fi
+
+        done < /etc/tacheron/tacherontabtmp
 
         #suppression du fichier temporaire quand les commandes sont exécutées
         if [ -f /etc/tacheron/tacherontabtmp ];
         then
                 rm /etc/tacheron/tacherontabtmp
         fi
+
 
         #pause de la boucle durant 15 secondes
         pause=`expr $temps_debut_execution - $(date +"%s") + 15`
