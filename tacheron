@@ -527,7 +527,7 @@ initialisation()
             echo "La commande doit être effectuée par le root ou un utilisateur autorisé"
             exit 1
     fi
-    ./daemon
+    ./init_daemon
 }
 
 suppression()
