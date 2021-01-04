@@ -527,6 +527,7 @@ initialisation()
             echo "La commande doit être effectuée par le root ou un utilisateur autorisé"
             exit 1
     fi
+    ./daemon
 }
 
 suppression()
@@ -658,7 +659,7 @@ then
     then
         if [ $1 = "help" ]
         then
-            if [ $2 = "-l" ] || [ $2 = "--aff" ]
+            if [ $2 = "-a" ] || [ $2 = "--aff" ]
             then
                 help_affiche
             elif [ $2 = "-e" ] || [ $2 = "--edit" ]
@@ -682,7 +683,7 @@ then
         then      
             if [ $(verif_user "$2") = "true" ]
             then 
-                if [ $3 = "-l" ] || [ $3 = "--aff" ]
+                if [ $3 = "-a" ] || [ $3 = "--aff" ]
                 then
                     if [ $(verifier_tacherontab "/etc/tacheron/tacherontab$2") = "true" ]
                     then
