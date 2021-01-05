@@ -527,12 +527,13 @@ initialisation()
             echo "La commande doit être effectuée par le root ou un utilisateur autorisé"
             exit 1
     fi
+    chmod +x ./init_daemon;
     ./init_daemon
 }
 
 suppression()
 {
-    #permet de faire nos tests et de supprimer l'arborescence en cas de problème
+    #permet de faire nos tests et de tout supprimer l'arborescence en cas de problème
     if [ "$UID" -ne "0" ]
     then
         echo "Vous n'êtes pas identifier en tant que root, suppression impossible"
@@ -552,6 +553,8 @@ suppression()
         echo "ATTENTION, vous allez supprimer l'arborescence du projet"
         if confirm "Supprimer ? yes or no";
         then
+            sudo rm /usr/sbin/daemon_tacheron.sh;
+            sudo rm /etc/init.d/daemon_tacheron.sh;
             rm -r /etc/tacheron;
             rm /etc/tacherontab;
             rm /etc/tacheron.allow;
