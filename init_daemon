@@ -1,17 +1,19 @@
 #!/bin/bash
 
-echo "Programmation du Démons en cours";
+echo "Programmation du Service Tacheron en cours";
 
-cp ./daemon_tacheron.sh /usr/sbin/daemon_tacheron.sh;
+cp ./daemon_tacheron.sh /usr/sbin/daemon_tacheron.sh; #permet de placer le script dans le dossier des services systèmes
 
-cp ./creation_skeleton.sh /etc/init.d/daemon_tacheron.sh;
+cp ./creation_skeleton.sh /etc/init.d/daemon_tacheron.sh; #permet de configurer le service demons
 
-chmod +x /etc/init.d/daemon_tacheron.sh;
+chmod +x /etc/init.d/daemon_tacheron.sh; #rend exécutable le fichier de configuration
 
-update-rc.d daemon_tacheron.sh defaults;
+update-rc.d daemon_tacheron.sh defaults; #permet l'ajout du service au démarrage du système
 
-/etc/init.d/daemon_tacheron.sh start;
+/etc/init.d/daemon_tacheron.sh start; #démarre le service
 
-echo "Programmation du Démons terminé";
+echo "Programmation du Service Tacheron terminé";
+
+
 
 

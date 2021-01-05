@@ -23,54 +23,54 @@ erreur_permission()
 # toutes les fonctions d'affichage pour le help
 help_user()
 {
-    echo "user - specifie un utilisateur particulier"
-    echo "--user [USER_NAME]"
-    echo "-u [USER_NAME]"
+    echo "      user : specifie un utilisateur particulier"
+    echo "      --user [USER_NAME]"
+    echo -e "      -u [USER_NAME]\n"
 }
 
 help_affiche()
 {
-    echo "aff - affiche le fichier tacherontab"
-    echo "--aff"
-    echo "-a" 
+    echo "      aff : affiche le fichier tacherontab"
+    echo "      --aff"
+    echo -e "      -a\n" 
 }
 
 help_remove()
 {
-    echo "rem - efface le fichier tacherontab"
-    echo "--rem"
-    echo "-r" 
+    echo "      rem : efface le fichier tacherontab"
+    echo "      --rem"
+    echo -e "      -r\n" 
 }
 
 help_edite()
 {
-    echo "edit - édite le fichier tacherontab dans vi"
-    echo "--edit"
-    echo "-e"
+    echo "      edit : édite le fichier tacherontab dans vi"
+    echo "      --edit"
+    echo -e "      -e\n"
 }
 
 help_suppr()
 {
-    echo "dell - supprime tous les fichiers dans etc et var"
-    echo "--dell"
-    echo "-d"
+    echo "      dell : stoppe le service et supprime l'arborescence"
+    echo "      --dell"
+    echo -e "      -d\n"
 }
 
 
 help()
 {
-    echo "NAME"
-    echo "Tacheron - planifier des taches"
-    echo "SYNOPSIS"
-    echo "tacheron [OPTION] [COMMANDE]"
-    echo "DESCRIPTION"
+    echo -e "   --------COMMANDE TACHERON--------\n"
+    echo -e "   NAME : Tacheron - Planificateur de taches\n"
+    echo -e "   AUTHORS : BORNE AUGUSTIN & LETELLIER QUENTIN\n"
+    echo -e "   SYNOPSIS : ./tacheron [OPTION] [COMMANDE]\n"
+    echo -e "   DESCRIPTION : \n"
     help_user
     help_affiche
     help_remove
     help_edite
-    help_edite
-    echo "Planifier une tache"
-    echo "[SECONDE][MINUTE][HEURES][JOUR DU MOIS][MOIS DE L'ANNEE][JOUR DE LA SEMAINE][COMMANDE]"
+    help_suppr
+    echo "  Planifier une tache"
+    echo "  [SECONDE][MINUTE][HEURES][JOUR DU MOIS][MOIS DE L'ANNEE][JOUR DE LA SEMAINE][COMMANDE]"
 }
 
 # verifier si le tacheron tab existe
@@ -529,11 +529,12 @@ initialisation()
     fi
     chmod +x ./init_daemon;
     ./init_daemon
+
 }
 
 suppression()
 {
-    #permet de faire nos tests et de tout supprimer l'arborescence en cas de problème
+    #permet de faire nos tests et de supprimer l'arborescence en cas de problème
     if [ "$UID" -ne "0" ]
     then
         echo "Vous n'êtes pas identifier en tant que root, suppression impossible"
@@ -553,13 +554,25 @@ suppression()
         echo "ATTENTION, vous allez supprimer l'arborescence du projet"
         if confirm "Supprimer ? yes or no";
         then
+            sudo /etc/init.d/daemon_tacheron.sh stop;
             sudo rm /usr/sbin/daemon_tacheron.sh;
             sudo rm /etc/init.d/daemon_tacheron.sh;
+            sudo update-rc.d daemon_tacheron.sh disable;
+            sudo update-rc.d -f daemon_tacheron.sh remove;
+            sudo rm /etc/rc0.d/K01daemon_tacheron;
+            sudo rm /etc/rc1.d/K01daemon_tacheron;
+            sudo rm /etc/rc2.d/S01daemon_tacheron;
+            sudo rm /etc/rc3.d/S01daemon_tacheron;
+            sudo rm /etc/rc4.d/S01daemon_tacheron;
+            sudo rm /etc/rc5.d/S01daemon_tacheron;
+            sudo rm /etc/rc6.d/K01daemon_tacheron;
+            sudo rm /etc/rcS.d/S01daemon_tacheron;
             rm -r /etc/tacheron;
             rm /etc/tacherontab;
             rm /etc/tacheron.allow;
             rm /etc/tacheron.deny;
             rm /var/log/tacheron;
+            rm ./fichierInitialisation
             echo "Suppression de l'arborescence effectuée"
         else    
             echo "Vous avez annulé la suppression";

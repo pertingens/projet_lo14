@@ -9,54 +9,6 @@ violetclair='\e[1;35m'
 bleu='\e[1;34m'
 #-------------------------------------------------------
 
-#initialisation arborescence 
-if [ "$UID" -eq "0" ] || ( grep "$(whoami)" "/etc/tacheron.allow" ) >/dev/null 2>&1;
-then
-        if [ ! -d /etc/tacheron ]; #verification si le répertoire existe
-        then 
-            mkdir /etc/tacheron;
-            chmod 777 /etc/tacheron;
-        fi
-
-        if [ ! -f /etc/tacherontab ]; #vérification si le fichier pour le root existe
-        then
-            touch /etc/tacherontab;
-            chmod 777 /etc/tacherontab; #on doit autoriser que le root à écrire 
-        fi
-
-        if [ ! -f /etc/tacheron/tacherontab$(whoami) ]; #vérification si le fichier user connecté existe
-        then
-            touch /etc/tacheron/tacherontab$(whoami);
-            chmod 777 /etc/tacheron/tacherontab$(whoami);
-        fi
-
-        if [ ! -f /etc/tacheron.allow ];
-        then    
-            touch /etc/tacheron.allow;
-            chmod 744 /etc/tacheron.allow;
-            echo "root" > /etc/tacheron.allow
-        fi
-
-        if [ ! -f /etc/tacheron.deny ];
-        then
-            touch /etc/tacheron.deny;
-            chmod 744 /etc/tacheron.deny;
-        fi
-
-        if [ ! -f /var/log/tacheron ];
-        then
-            sudo chmod 777 /var/log;
-            sudo touch /var/log/tacheron;
-            chmod 777 /var/log/tacheron;
-            echo "-----------------------------------------------" > /var/log/tacheron
-            echo "      HISTORIQUE DE LA COMMANDE TACHERON       " >> /var/log/tacheron
-            echo "-----------------------------------------------" >> /var/log/tacheron
-        fi
-else
-        echo "La commande doit être effectuée par le root ou un utilisateur autorisé"
-        exit 1
-fi
-
 #fonction principale
 executer_commande_tacheron()
 {
@@ -174,9 +126,10 @@ executer_commande_tacheron()
                 done < $1 #lecture des commandes de tacherontab user connecte
 }
 
-#boucle sans fin (à démarrer en processus demon dès l'ouverture du système et en arrière-plan)
+#boucle sans fin
 while [ true ]
 do
+
         temps_debut_execution=$(date +"%s")
         touch /etc/tacheron/tacherontabtmp #création d'un fichier qui accueillera les commandes à exécuter de chaque utilisateur
 
@@ -206,7 +159,7 @@ do
                 if [[ -n $commande ]]; #permet la résolution d'un problème d'écriture dans tmp
                 then
                         sudo $commande 2>/dev/null; #affichage commande sur la sortie standard s'il y a lieu
-                        if [ $? -eq 0 ];
+                        if [ $? -eq 0 ]; #vérification s'il y a eu une erreur
                         then
                                 echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${vertfonce}[Réussi]${blanc}\n" >> /var/log/tacheron
                                 #on écrit dans le fichier log historique ok
@@ -226,8 +179,6 @@ do
                 rm /etc/tacheron/tacherontabtmp
         fi
 
-
         #pause de la boucle durant 15 secondes
-        pause=`expr $temps_debut_execution - $(date +"%s") + 15`
-        sleep $pause
+        sleep 15
 done
