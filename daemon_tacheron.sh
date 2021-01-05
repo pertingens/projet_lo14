@@ -125,11 +125,10 @@ executer_commande_tacheron()
         
                 done < $1 #lecture des commandes de tacherontab user connecte
 }
-
+i=0
 #boucle sans fin
 while [ true ]
 do
-
         temps_debut_execution=$(date +"%s")
         touch /etc/tacheron/tacherontabtmp #création d'un fichier qui accueillera les commandes à exécuter de chaque utilisateur
 
@@ -177,8 +176,10 @@ do
         if [ -f /etc/tacheron/tacherontabtmp ];
         then
                 rm /etc/tacheron/tacherontabtmp
+                
         fi
 
         #pause de la boucle durant 15 secondes
         sleep 15
+
 done

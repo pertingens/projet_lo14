@@ -555,18 +555,9 @@ suppression()
         if confirm "Supprimer ? yes or no";
         then
             sudo /etc/init.d/daemon_tacheron.sh stop;
-            sudo rm /usr/sbin/daemon_tacheron.sh;
-            sudo rm /etc/init.d/daemon_tacheron.sh;
-            sudo update-rc.d daemon_tacheron.sh disable;
             sudo update-rc.d -f daemon_tacheron.sh remove;
-            sudo rm /etc/rc0.d/K01daemon_tacheron;
-            sudo rm /etc/rc1.d/K01daemon_tacheron;
-            sudo rm /etc/rc2.d/S01daemon_tacheron;
-            sudo rm /etc/rc3.d/S01daemon_tacheron;
-            sudo rm /etc/rc4.d/S01daemon_tacheron;
-            sudo rm /etc/rc5.d/S01daemon_tacheron;
-            sudo rm /etc/rc6.d/K01daemon_tacheron;
-            sudo rm /etc/rcS.d/S01daemon_tacheron;
+            sudo rm /etc/init.d/daemon_tacheron.sh;
+            sudo rm /usr/sbin/daemon_tacheron.sh;
             rm -r /etc/tacheron;
             rm /etc/tacherontab;
             rm /etc/tacheron.allow;

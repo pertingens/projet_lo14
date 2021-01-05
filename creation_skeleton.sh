@@ -39,7 +39,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 #
 do_start()
 {
-        start-stop-daemon --background --start --pidfile $PIDFILE --exec $DAEMON || return 1
+        start-stop-daemon --background --start --make-pidfile --pidfile $PIDFILE --exec $DAEMON || return 1
 }
 
 #
@@ -47,7 +47,7 @@ do_start()
 #
 do_stop()
 {
-        start-stop-daemon --stop --retry 5 --pidfile $PIDFILE
+        start-stop-daemon --stop --retry 5 --remove-pidfile --pidfile $PIDFILE
         rm -f $PIDFILE
 }
 
