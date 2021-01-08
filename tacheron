@@ -732,19 +732,24 @@ then
         fi
     elif [ $# -ge 7 ]
     then
-        result=$(transformation_argument $@)
-        #echo "$result"
-        if [ $(verif_argument "$result") = "true" ]
+        if [ $(verif_createur $(whoami)) = "true" ]
         then
-            if [ "$(recuperation_user $@)" != "" ]
+            result=$(transformation_argument $@)
+            #echo "$result"
+            if [ $(verif_argument "$result") = "true" ]
             then
-                user=$(recuperation_user $@)
-                echo "$result" >> "/etc/tacheron/tacherontab$user"
+                if [ "$(recuperation_user $@)" != "" ]
+                then
+                    user=$(recuperation_user $@)
+                    echo "$result" >> "/etc/tacheron/tacherontab$user"
+                else
+                    echo "$result" >> "/etc/tacherontab"
+                fi
             else
-                echo "$result" >> "/etc/tacherontab"
+                erreur_saisie
             fi
         else
-            erreur_saisie
+            erreur_permission
         fi
     else
     erreur_saisie
