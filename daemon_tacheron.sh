@@ -125,7 +125,7 @@ executer_commande_tacheron()
         
                 done < $1 #lecture des commandes de tacherontab user connecte
 }
-i=0
+
 #boucle sans fin
 while [ true ]
 do
@@ -142,15 +142,14 @@ do
         date_reel=$(date +%u-%d-%m-%H-%M-%S)
        
         
-        user_connecte=$(whoami);
-        #vérification si l'utilisateur_connecte est dans la liste des personnes autorisés
-        if ( grep "$user_connecte" "/etc/tacheron.allow" ) >/dev/null 2>&1; #permet de ne pas afficher le grep 
-        then
-                executer_commande_tacheron /etc/tacheron/tacherontab$user_connecte
-                executer_commande_tacheron /etc/tacherontab
-        else #sinon on exécute seulement les tâches de root
-                executer_commande_tacheron /etc/tacherontab
-        fi
+        user_connecte=$(whoami);    
+        if [ -f /etc/tacheron/tacherontab$(whoami) ]; #vérification si le fichier user connecté existe
+            then
+        echo "/etc/tacheron/tacherontab$user_connecte"
+        executer_commande_tacheron /etc/tacheron/tacherontab$user_connecte
+        fi    
+        executer_commande_tacheron /etc/tacherontab
+       
 
         #exécution des commandes du fichier temporaire
         while read user_programmeur date_reel heure_reel commande

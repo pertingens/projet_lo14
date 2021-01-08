@@ -584,7 +584,6 @@ edite_fichier()
         then
             echo "la ligne $compteur n'est pas conforme : \"$ligne\""
         else
-            echo "ajouté : $ligne"
             echo "$ligne">>temp2
         fi
         let "compteur = $compteur + 1"
