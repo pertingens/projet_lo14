@@ -70,7 +70,7 @@ help()
     help_edite
     help_suppr
     echo "  Planifier une tache"
-    echo "  [SECONDE][MINUTE][HEURES][JOUR DU MOIS][MOIS DE L'ANNEE][JOUR DE LA SEMAINE][COMMANDE]"
+    echo "  ./tacheron <SECONDE> <MINUTE> <HEURES> <JOUR DU MOIS> <MOIS DE L'ANNEE> <JOUR DE LA SEMAINE> [<-u> <user>] <commande>"
 }
 
 # verifier si le tacheron tab existe
