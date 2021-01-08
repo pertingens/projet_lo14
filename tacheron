@@ -760,7 +760,7 @@ else
         if [ $1 = "-i" ] || [ $1 = "--init" ]
         then
             initialisation
-            echo "1">fichierInitialisation
+            echo "1" > fichierInitialisation
         else
             echo "veuillez initialiser tacheron"
             exit 0
