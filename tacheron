@@ -249,11 +249,11 @@ verif_minute()
     then
         echo "true"
     #Une liste de valeurs valides, séparées par des virgules
-    elif [[ $1 =~ ^([0-9]|1[0-9]|2[0-3])(,([0-9]|[1-5][0-9]))+$ ]]
+    elif [[ $1 =~ ^(0[0-9]|1[0-9]|2[0-3])(,(0[0-9]|[1-5][0-9]))+$ ]]
     then
        echo "true"
     # Un intervalle avec les ~pris en compte
-    elif [[ $1 =~ ^([0-9]|[1-5][0-9])-([0-9]|[1-5][0-9])(~([0-9]|[1-5][0-9]))*$ ]]
+    elif [[ $1 =~ ^(0[0-9]|[1-5][0-9])-(0[0-9]|[1-5][0-9])(~(0[0-9]|[1-5][0-9]))*$ ]]
     then
         echo "true"
     # toutes les valeurs du champs
@@ -261,7 +261,7 @@ verif_minute()
     then
         echo "true"
     # division d'un intervalle par un nombre precis
-    elif [[ $1 =~ ^([0-9]|[1-5][0-9])-([0-9]|[1-5][0-9])(~([0-9]|[1-5][0-9]))*/([0-9]|[1-5][0-9])$ ]]
+    elif [[ $1 =~ ^(0[0-9]|[1-5][0-9])-(0[0-9]|[1-5][0-9])(~([0-9]|[1-5][0-9]))*/([0-9]|[1-5][0-9])$ ]]
     then
         echo "true"
     # division de toutes les valeurs du champs par un nombre
@@ -280,11 +280,11 @@ verif_heure()
     then
         echo "true"
     #Une liste de valeurs valides, séparées par des virgules
-    elif [[ $1 =~ ^([0-9]|1[0-9]|2[0-3])(,([0-9]|1[0-9]|2[0-3]))+$ ]]
+    elif [[ $1 =~ ^(0[0-9]|1[0-9]|2[0-3])(,(0[0-9]|1[0-9]|2[0-3]))+$ ]]
     then
        echo "true"
     # Un intervalle avec les ~pris en compte
-    elif [[ $1 =~ ^([0-9]|1[0-9]|2[0-3])-([0-9]|1[0-9]|2[0-3])(~([0-9]|1[0-9]|2[0-3]))*$ ]]
+    elif [[ $1 =~ ^(0[0-9]|1[0-9]|2[0-3])-(0[0-9]|1[0-9]|2[0-3])(~(0[0-9]|1[0-9]|2[0-3]))*$ ]]
     then
         echo "true"
     # toutes les valeurs du champs
@@ -292,7 +292,7 @@ verif_heure()
     then
         echo "true"
     # division d'un intervalle par un nombre precis
-    elif [[ $1 =~ ^([0-9]|1[0-9]|2[0-3])-([0-9]|1[0-9]|2[0-3])(~([0-9]|1[0-9]|2[0-3]))*/([0-9]|1[0-9]|2[0-3])$ ]]
+    elif [[ $1 =~ ^(0[0-9]|1[0-9]|2[0-3])-(0[0-9]|1[0-9]|2[0-3])(~([0-9]|1[0-9]|2[0-3]))*/([0-9]|1[0-9]|2[0-3])$ ]]
     then
         echo "true"
     # division de toutes les valeurs du champs par un nombre
@@ -307,15 +307,15 @@ verif_heure()
 verif_jourDuMois()
 {
 
-    if [[ $1 =~ ^([0-9]|[1-2][0-9]|3[0-1])$ ]]
+    if [[ $1 =~ ^(0[0-9]|[1-2][0-9]|3[0-1])$ ]]
     then
         echo "true"
     #Une liste de valeurs valides, séparées par des virgules
-    elif [[ $1 =~ ^([0-9]|[1-2][0-9]|3[0-1])(,([0-9]|[1-2][0-9]|3[0-1]))+$ ]]
+    elif [[ $1 =~ ^(0[0-9]|[1-2][0-9]|3[0-1])(,(0[0-9]|[1-2][0-9]|3[0-1]))+$ ]]
     then
        echo "true"
     # Un intervalle avec les ~pris en compte
-    elif [[ $1 =~ ^([0-9]|[1-2][0-9]|3[0-1])-([0-9]|[1-2][0-9]|3[0-1])(~([0-9]|[1-2][0-9]|3[0-1]))*$ ]]
+    elif [[ $1 =~ ^(0[0-9]|[1-2][0-9]|3[0-1])-(0[0-9]|[1-2][0-9]|3[0-1])(~(0[0-9]|[1-2][0-9]|3[0-1]))*$ ]]
     then
         echo "true"
     # toutes les valeurs du champs
@@ -323,7 +323,7 @@ verif_jourDuMois()
     then
         echo "true"
     # division d'un intervalle par un nombre precis
-    elif [[ $1 =~ ^([0-9]|[1-2][0-9]|3[0-1])-([0-9]|[1-2][0-9]|3[0-1])(~([0-9]|[1-2][0-9]|3[0-1]))*/([0-9]|[1-2][0-9]|3[0-1])$ ]]
+    elif [[ $1 =~ ^(0[0-9]|[1-2][0-9]|3[0-1])-(0[0-9]|[1-2][0-9]|3[0-1])(~([0-9]|[1-2][0-9]|3[0-1]))*/([0-9]|[1-2][0-9]|3[0-1])$ ]]
     then
         echo "true"
     # division de toutes les valeurs du champs par un nombre
@@ -338,15 +338,15 @@ verif_jourDuMois()
 verif_moisDeAnnee()
 {
 
-    if [[ $1 =~ ^([0-9]|1[0-2])$ ]]
+    if [[ $1 =~ ^(0[0-9]|1[0-2])$ ]]
     then
         echo "true"
     #Une liste de valeurs valides, séparées par des virgules
-    elif [[ $1 =~ ^([0-9]|1[0-2])(,([0-9]|1[0-2]))+$ ]]
+    elif [[ $1 =~ ^(0[0-9]|1[0-2])(,(0[0-9]|1[0-2]))+$ ]]
     then
        echo "true"
     # Un intervalle avec les ~pris en compte
-    elif [[ $1 =~ ^([0-9]|1[0-2])-([0-9]|1[0-2])(~([0-9]|1[0-2]))*$ ]]
+    elif [[ $1 =~ ^(0[0-9]|1[0-2])-(0[0-9]|1[0-2])(~(0[0-9]|1[0-2]))*$ ]]
     then
         echo "true"
     # toutes les valeurs du champs
@@ -354,7 +354,7 @@ verif_moisDeAnnee()
     then
         echo "true"
     # division d'un intervalle par un nombre precis
-    elif [[ $1 =~ ^([0-9]|1[0-2])-([0-9]|1[0-2])(~([0-9]|1[0-2]))*/([0-9]|1[0-2])$ ]]
+    elif [[ $1 =~ ^(0[0-9]|1[0-2])-(0[0-9]|1[0-2])(~([0-9]|1[0-2]))*/([0-9]|1[0-2])$ ]]
     then
         echo "true"
     # division de toutes les valeurs du champs par un nombre
