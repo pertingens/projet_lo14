@@ -159,7 +159,7 @@ do
                         sudo $commande 2>/dev/null; #affichage commande sur la sortie standard s'il y a lieu
                         if [ $? -eq 0 ]; #vérification s'il y a eu une erreur
                         then
-                                echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${vertfonce}[Réussi]${blanc}\nAffichage de la commande:\n ${bleu}$($commande)\n" >> /var/log/tacheron
+                                echo -e "- ${bleu}$commande ${blanc}effectué le ${orange}<$date_reel> ${blanc}à ${orange}<$heure_reel> ${blanc}programmé par ${violetclair}$user_programmeur ${vertfonce}[Réussi]${blanc}\nAffichage de la commande:\n ${bleu}$($commande)${blanc}\n" >> /var/log/tacheron
                                 #on écrit dans le fichier log historique ok
                         else
                                 error=$($commande 2>&1); #on récupère le message d'erreur dans une variable
