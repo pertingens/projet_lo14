@@ -142,7 +142,7 @@ do
         date_reel=$(date +%u-%d-%m-%H-%M-%S)
        
         
-        user_connecte=$(whoami);    
+        user_connecte=$(who | cut -d" " -f1);
         if [ -f /etc/tacheron/tacherontab$(whoami) ]; #vérification si le fichier user connecté existe
             then
         echo "/etc/tacheron/tacherontab$user_connecte"
