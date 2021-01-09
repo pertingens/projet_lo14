@@ -4,7 +4,7 @@
 #affichage en cas d'erreur de saisie
 erreur_saisie()
 {
-    echo "mauvais argument(s) pour tacheron"
+    echo "Mauvais argument(s) pour tacheron"
     echo "help pour plus d'information"
     exit 0
 }
@@ -17,7 +17,7 @@ erreur_fichier_inexistant()
 
 erreur_permission()
 {
-    echo "Vous avez pas la permission d'editer ce fichier, veuillez contacter votre administrateur"
+    echo "Vous n'avez pas la permission d'editer ce fichier, veuillez contacter votre administrateur"
     exit 0
 }
 # toutes les fonctions d'affichage pour le help
@@ -70,7 +70,9 @@ help()
     help_edite
     help_suppr
     echo "  Planifier une tache"
-    echo "  ./tacheron <SECONDE> <MINUTE> <HEURES> <JOUR DU MOIS> <MOIS DE L'ANNEE> <JOUR DE LA SEMAINE> [<-u> <user>] <commande>"
+    echo "  ./tacheron <SECONDE> <MINUTE> <HEURE> <JOUR DU MOIS> <MOIS DE L'ANNEE> <JOUR DE LA SEMAINE> [<-u> <user>] <commande>"
+    echo "Pour les secondes indiquez les chiffres sous le format 0, 1, 2, 3"
+    echo "Pour le reste, indiquez les chiffres sous le format 01, 02, ..."
 }
 
 # verifier si le tacheron tab existe
@@ -245,7 +247,7 @@ verif_seconde()
 verif_minute()
 {
 
-    if [[ $1 =~ ^([0-9]|[1-5][0-9])$ ]]
+    if [[ $1 =~ ^(0[0-9]|[1-5][0-9])$ ]]
     then
         echo "true"
     #Une liste de valeurs valides, séparées par des virgules
@@ -276,7 +278,7 @@ verif_minute()
 verif_heure()
 {
 
-    if [[ $1 =~ ^([0-9]|1[0-9]|2[0-3])$ ]]
+    if [[ $1 =~ ^(0[0-9]|1[0-9]|2[0-3])$ ]]
     then
         echo "true"
     #Une liste de valeurs valides, séparées par des virgules
@@ -537,7 +539,7 @@ suppression()
     #permet de faire nos tests et de supprimer l'arborescence en cas de problème
     if [ "$UID" -ne "0" ]
     then
-        echo "Vous n'êtes pas identifier en tant que root, suppression impossible"
+        echo "Vous n'êtes pas identifié en tant que root, suppression impossible"
     else    
         confirm()
         {
@@ -606,11 +608,11 @@ then
             initialisation
             echo "1">fichierInitialisation
         else
-            echo "veuillez initialiser tacheron"
+            echo "Veuillez initialiser tacheron"
             exit 0
         fi
     else
-        echo "veuillez initialiser tacheron"
+        echo "Veuillez initialiser tacheron"
         exit 0
     fi
 elif [ "$(cat fichierInitialisation)" = "1" ]
@@ -762,11 +764,11 @@ else
             initialisation
             echo "1" > fichierInitialisation
         else
-            echo "veuillez initialiser tacheron"
+            echo "Veuillez initialiser tacheron"
             exit 0
         fi
     else
-        echo "veuillez initialiser tacheron"
+        echo "Veuillez initialiser tacheron"
         exit 0
     fi
 fi

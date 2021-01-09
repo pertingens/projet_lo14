@@ -29,14 +29,40 @@ executer_commande_tacheron()
                 #on test l'interval des secondes
                 if [ "$seconde_virtuel" != "*" ]; #si c'est toutes les valeurs, on passe au champ suivant
                 then
-                        let "minimum=seconde_virtuel*15"
-                        let "maximum=seconde_virtuel*15+15"
-                        if [ "$minimum" -gt "${date_reel[1]}" ] || [ "${date_reel[1]}" -ge "$maximum" ]; #si les secondes correspondent au passe au champ suivant
+                        test_seconde="non";
+                        if [ "$( expr index "$seconde_virtuel" "," )" != "0" ]; #si c'est une liste dans les secondes
                         then
-                                execution_commande="faux"
-                                continue #si les secondes correspondent pas, on continue de tester les autres lignes de tacherontab (continue s'applique au while)
+                                seconde_virtuel="${seconde_virtuel//,/ }"  #remplacement de toutes les virgules de la chaine par un blanc
+                                for test in $seconde_virtuel
+                                do 
+                                        let "minimum=test*15"
+                                        let "maximum=test*15+14"
+                                        if [ "$minimum" -lt "${date_reel[1]}" ] && [ "${date_reel[1]}" -le "$maximum" ]; #si les secondes correspondent au passe au champ suivant
+                                        then
+                                                test_seconde="ok"
+                                                break 
+                                        fi
+                                done
+                                
+                                if [ "$test_seconde" != "ok" ];
+                                then
+                                        execution_commande="faux"
+                                        continue
+                                fi
+                                
+
+                        elif [ "$seconde_virtuel" == "0" ] || [ "$seconde_virtuel" == "1" ] || [ "$seconde_virtuel" == "2" ] || [ "$seconde_virtuel" == "3" ] ; #si c'est valeur précise 0 ou 1 ou 2 ou 3
+                        then
+                                let "minimum=seconde_virtuel*15"
+                                let "maximum=seconde_virtuel*15+14"
+                                if [ "$minimum" -gt "${date_reel[1]}" ] || [ "${date_reel[1]}" -ge "$maximum" ]; #si les secondes correspondent au passe au champ suivant
+                                then
+                                        execution_commande="faux"
+                                        continue #si les secondes correspondent pas, on continue de tester les autres lignes de tacherontab (continue s'applique au while)
+                                fi
                         fi
-                fi
+      
+                fi 
 
                         #si l'interval des secondes correspond, on teste les autres champs temporels
                         indice_date_reel="1";
@@ -144,9 +170,8 @@ do
         
         user_connecte=$(who | cut -d" " -f1);
         if [ -f /etc/tacheron/tacherontab$(whoami) ]; #vérification si le fichier user connecté existe
-            then
-        echo "/etc/tacheron/tacherontab$user_connecte"
-        executer_commande_tacheron /etc/tacheron/tacherontab$user_connecte
+        then
+                executer_commande_tacheron /etc/tacheron/tacherontab$user_connecte
         fi    
         executer_commande_tacheron /etc/tacherontab
        
