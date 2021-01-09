@@ -8,9 +8,9 @@ cp ./creation_skeleton.sh /etc/init.d/daemon_tacheron.sh; #permet de configurer 
 
 chmod +x /etc/init.d/daemon_tacheron.sh; #rend exécutable le fichier de configuration
 
-update-rc.d daemon_tacheron.sh defaults; #permet l'ajout du service au démarrage du système
+update-rc.d daemon_tacheron.sh defaults 2>/dev/null; #permet l'ajout du service au démarrage du système
 
-/etc/init.d/daemon_tacheron.sh start; #démarre le service
+/etc/init.d/daemon_tacheron.sh start 2>/dev/null; #démarre le service
 
 echo "Programmation du Service Tacheron terminé";
 
